@@ -1,5 +1,1 @@
-export class RDSAuroraBootstrapper {
-  public bootstrap() {
-    return 'bootstrap';
-  }
-}
+export * from './constructs/aurora-database-create-owner';
