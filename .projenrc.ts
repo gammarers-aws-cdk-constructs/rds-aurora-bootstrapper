@@ -15,7 +15,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
     '@aws-sdk/client-secrets-manager@^3.743.0',
     '@types/aws-lambda@^8.10.161',
   ],
-  releaseToNpm: false,
+  releaseToNpm: true,
   npmTrustedPublishing: false,
   npmAccess: javascript.NpmAccess.PUBLIC,
   mergify: true,
