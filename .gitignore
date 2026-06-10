@@ -50,4 +50,6 @@ junit.xml
 .jsii
 tsconfig.json
 !/API.md
+/assets/
+!/src/funcs/aurora-database-create-owner-function.ts
 !/.projenrc.ts

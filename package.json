@@ -7,6 +7,9 @@
   "scripts": {
     "build": "projen build",
     "bump": "projen bump",
+    "bundle": "projen bundle",
+    "bundle:funcs/aurora-database-create-owner.lambda": "projen bundle:funcs/aurora-database-create-owner.lambda",
+    "bundle:funcs/aurora-database-create-owner.lambda:watch": "projen bundle:funcs/aurora-database-create-owner.lambda:watch",
     "clobber": "projen clobber",
     "compat": "projen compat",
     "compile": "projen compile",
@@ -34,7 +37,10 @@
     "organization": false
   },
   "devDependencies": {
+    "@aws-sdk/client-rds-data": "^3.743.0",
+    "@aws-sdk/client-secrets-manager": "^3.743.0",
     "@stylistic/eslint-plugin": "^2",
+    "@types/aws-lambda": "^8.10.161",
     "@types/jest": "^30.0.0",
     "@types/node": "^20",
     "@typescript-eslint/eslint-plugin": "^8",
@@ -42,6 +48,7 @@
     "aws-cdk-lib": "2.232.0",
     "commit-and-tag-version": "^12",
     "constructs": "10.5.1",
+    "esbuild": "^0.28.0",
     "eslint": "^9",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
