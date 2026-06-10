@@ -153,6 +153,7 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
+          "src/funcs/aurora-database-create-owner.lambda.ts",
           ".projenrc.ts",
           "projenrc/**/*.ts"
         ],

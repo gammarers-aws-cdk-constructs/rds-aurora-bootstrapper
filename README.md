@@ -1,1 +1,1 @@
-# RDS Arora Bootstrapper (AWS CDK V2)
+# RDS Aurora Bootstrapper (AWS CDK V2)
