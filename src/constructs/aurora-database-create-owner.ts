@@ -27,6 +27,10 @@ export interface AuroraDatabaseCreateOwnerProps {
 /**
  * CDK construct that provisions a PostgreSQL owner role on an Aurora cluster
  * using a custom resource backed by the RDS Data API.
+ *
+ * The master username is derived from the `username` field of
+ * {@link AuroraDatabaseCreateOwnerProps.dbMasterUserCredentials} through a
+ * Secrets Manager dynamic reference; callers do not pass it explicitly.
  */
 export class AuroraDatabaseCreateOwner extends Construct {
   /**

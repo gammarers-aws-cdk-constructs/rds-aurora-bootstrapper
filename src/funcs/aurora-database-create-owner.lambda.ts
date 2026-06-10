@@ -7,10 +7,12 @@ const rdsDataClient = new RDSDataClient({});
 /**
  * Custom resource handler that creates a PostgreSQL owner role on Aurora.
  *
- * On Create, checks whether the owner role already exists; if not, creates it
- * with `NOLOGIN NOINHERIT` and grants it to the master user inside a
- * transaction. Update and Delete are no-ops that preserve the physical
- * resource ID.
+ * On Create, reads `MasterUserSecretArn`, `MasterUsername`, `DatabaseName`,
+ * `ClusterArn`, and `OwnerUsername` from `ResourceProperties`. `MasterUsername`
+ * is resolved by CloudFormation from the credentials secret at deploy time.
+ * If the owner role does not already exist, creates it with `NOLOGIN NOINHERIT`
+ * and grants it to the master user inside a transaction. Update and Delete are
+ * no-ops that preserve the physical resource ID.
  *
  * @param event - CloudFormation custom resource event.
  * @param context - Lambda execution context.
@@ -28,22 +30,22 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
       const clusterArn = event.ResourceProperties.ClusterArn as string;
       const ownerUsername = event.ResourceProperties.OwnerUsername as string;
 
-      const physicalResourceId = 'database-create-owner-1a';
+      const physicalResourceId = `${clusterArn}:${databaseName}:${ownerUsername}`;
 
-      // 👇 Begin transaction.
-      const { transactionId } = await rdsDataClient.send(new BeginTransactionCommand({
+      const rdsDataTarget = {
         resourceArn: clusterArn,
         secretArn: masterUserSecretArn,
         database: databaseName,
-      }));
+      };
+
+      // 👇 Begin transaction.
+      const { transactionId } = await rdsDataClient.send(new BeginTransactionCommand(rdsDataTarget));
 
       try {
 
         const exists = await (async () => {
           const result = await rdsDataClient.send(new ExecuteStatementCommand({
-            resourceArn: clusterArn,
-            secretArn: masterUserSecretArn,
-            database: databaseName,
+            ...rdsDataTarget,
             transactionId,
             formatRecordsAs: 'JSON',
             sql: 'SELECT 1 FROM pg_roles WHERE rolname = :r',
@@ -55,25 +57,21 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
         if (!exists) {
           // Create user
           await rdsDataClient.send(new ExecuteStatementCommand({
-            resourceArn: clusterArn,
-            secretArn: masterUserSecretArn,
-            database: databaseName,
+            ...rdsDataTarget,
             transactionId,
             sql: `CREATE ROLE ${ownerUsername} NOLOGIN NOINHERIT`,
           }));
 
           // 👇 次の処理のために実行ロールを変更
           await rdsDataClient.send(new ExecuteStatementCommand({
-            resourceArn: clusterArn,
-            secretArn: masterUserSecretArn,
-            database: databaseName,
+            ...rdsDataTarget,
             transactionId,
             sql: `GRANT ${ownerUsername} TO ${masterUsername}`,
           }));
 
           await rdsDataClient.send(new CommitTransactionCommand({
-            resourceArn: clusterArn,
-            secretArn: masterUserSecretArn,
+            resourceArn: rdsDataTarget.resourceArn,
+            secretArn: rdsDataTarget.secretArn,
             transactionId,
           }));
         }
@@ -87,8 +85,8 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
       } catch (error) {
         if (transactionId) {
           await rdsDataClient.send(new RollbackTransactionCommand({
-            resourceArn: clusterArn,
-            secretArn: masterUserSecretArn,
+            resourceArn: rdsDataTarget.resourceArn,
+            secretArn: rdsDataTarget.secretArn,
             transactionId,
           })).catch(() => {});
         }
