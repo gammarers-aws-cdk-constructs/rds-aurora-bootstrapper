@@ -25,9 +25,9 @@
     "stripInternal": true,
     "target": "ES2020",
     "types": [
+      "aws-lambda",
       "jest",
-      "node",
-      "aws-lambda"
+      "node"
     ]
   },
   "include": [

@@ -180,7 +180,18 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
         "MasterUserSecretArn": {
           "Ref": "MasterUserSecret68CFFBC6",
         },
-        "MasterUsername": "postgres",
+        "MasterUsername": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "MasterUserSecret68CFFBC6",
+              },
+              ":SecretString:username::}}",
+            ],
+          ],
+        },
         "OwnerUsername": "app_owner",
         "ServiceTimeout": "10",
         "ServiceToken": {
@@ -206,7 +217,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "8eafda54b6fde2ce32a04480a2857527384a518e4c6f50e7459aec02ac2b593f.zip",
+          "S3Key": "a1315fc8ee1673184daeb4eca579e35787b9664d664a8ab514c28780987dc82d.zip",
         },
         "Description": "src/funcs/aurora-database-create-owner.lambda.ts",
         "Environment": {

@@ -7,19 +7,37 @@ import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import { AuroraDatabaseCreateOwnerFunction } from '../funcs/aurora-database-create-owner-function';
 
+/**
+ * Properties for {@link AuroraDatabaseCreateOwner}.
+ */
 export interface AuroraDatabaseCreateOwnerProps {
-  dbMasterUserCredentials: Secret;
-  dbCluster: DatabaseCluster;
-  dbName: string;
-  ownerUserName: string;
-  masterUsername: string;
+  /**
+   * Secrets Manager secret holding the Aurora master user credentials.
+   * The `username` field is passed to the custom resource via a dynamic reference.
+   */
+  readonly dbMasterUserCredentials: Secret;
+  /** Aurora database cluster where the owner role is created. */
+  readonly dbCluster: DatabaseCluster;
+  /** Name of the PostgreSQL database targeted by the custom resource. */
+  readonly dbName: string;
+  /** Username of the owner role to create (`NOLOGIN`, `NOINHERIT`). */
+  readonly ownerUsername: string;
 }
 
+/**
+ * CDK construct that provisions a PostgreSQL owner role on an Aurora cluster
+ * using a custom resource backed by the RDS Data API.
+ */
 export class AuroraDatabaseCreateOwner extends Construct {
+  /**
+   * @param scope - Parent construct.
+   * @param id - Construct identifier.
+   * @param props - Configuration for the database owner role.
+   */
   constructor(scope: Construct, id: string, props: AuroraDatabaseCreateOwnerProps) {
     super(scope, id);
 
-    const { dbMasterUserCredentials, dbCluster, dbName, ownerUserName, masterUsername } = props;
+    const { dbMasterUserCredentials, dbCluster, dbName, ownerUsername } = props;
 
     // 👇 Create database owner.
     const createOwnerFunction = new AuroraDatabaseCreateOwnerFunction(this, 'AuroraDatabaseCreateOwnerFunction', {
@@ -53,10 +71,10 @@ export class AuroraDatabaseCreateOwner extends Construct {
       serviceTimeout: Duration.seconds(10),
       properties: {
         MasterUserSecretArn: dbMasterUserCredentials.secretArn,
-        MasterUsername: masterUsername,
+        MasterUsername: dbMasterUserCredentials.secretValueFromJson('username').unsafeUnwrap(),
         DatabaseName: dbName,
         ClusterArn: dbCluster.clusterArn,
-        OwnerUsername: ownerUserName,
+        OwnerUsername: ownerUsername,
       },
     });
     createOwner.node.addDependency(dbCluster);

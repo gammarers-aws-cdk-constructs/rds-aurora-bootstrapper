@@ -1,8 +1,22 @@
 import { RDSDataClient, ExecuteStatementCommand, BeginTransactionCommand, CommitTransactionCommand, RollbackTransactionCommand } from '@aws-sdk/client-rds-data';
 import { Context, CdkCustomResourceEvent, CdkCustomResourceResponse, CdkCustomResourceHandler } from 'aws-lambda';
 
+/** Reused RDS Data API client for the Lambda execution environment. */
 const rdsDataClient = new RDSDataClient({});
 
+/**
+ * Custom resource handler that creates a PostgreSQL owner role on Aurora.
+ *
+ * On Create, checks whether the owner role already exists; if not, creates it
+ * with `NOLOGIN NOINHERIT` and grants it to the master user inside a
+ * transaction. Update and Delete are no-ops that preserve the physical
+ * resource ID.
+ *
+ * @param event - CloudFormation custom resource event.
+ * @param context - Lambda execution context.
+ * @returns Custom resource response with a physical resource ID and optional data.
+ * @throws Rethrows any error after rolling back an open transaction on Create.
+ */
 export const handler: CdkCustomResourceHandler = async (event: CdkCustomResourceEvent, context: Context): Promise<CdkCustomResourceResponse> => {
   console.log({ event, context });
 

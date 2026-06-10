@@ -10,7 +10,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   packageManager: javascript.NodePackageManager.YARN_CLASSIC,
   projenrcTs: true,
   repositoryUrl: 'https://github.com/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper.git',
-  deps: [
+  devDeps: [
     '@aws-sdk/client-rds-data@^3.743.0',
     '@aws-sdk/client-secrets-manager@^3.743.0',
     '@types/aws-lambda@^8.10.161',

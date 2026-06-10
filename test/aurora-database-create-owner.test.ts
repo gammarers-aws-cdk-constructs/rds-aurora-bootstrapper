@@ -29,8 +29,7 @@ describe('AuroraDatabaseCreateOwner', () => {
       dbMasterUserCredentials: secret,
       dbCluster: cluster,
       dbName: 'appdb',
-      ownerUserName: 'app_owner',
-      masterUsername: 'postgres',
+      ownerUsername: 'app_owner',
     });
 
     const template = Template.fromStack(stack);
