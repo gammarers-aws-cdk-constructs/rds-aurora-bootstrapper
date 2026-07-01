@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
+exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
 {
   "Parameters": {
     "BootstrapVersion": {
@@ -142,7 +142,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       "Type": "AWS::RDS::DBInstance",
       "UpdateReplacePolicy": "Delete",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerCustomResource9B2AD69D": {
+    "CreateSchemaCreateSchemaCustomResourceA1B1DB01": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
         "ClusterEB0386A7",
@@ -177,6 +177,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           ],
         },
         "DatabaseName": "appdb",
+        "IsDropPublicSchema": true,
         "MasterUserSecretArn": {
           "Ref": "MasterUserSecret68CFFBC6",
         },
@@ -193,10 +194,11 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           ],
         },
         "OwnerUsername": "app_owner",
+        "SchemaName": "app_schema",
         "ServiceTimeout": "10",
         "ServiceToken": {
           "Fn::GetAtt": [
-            "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEvent16172B35",
+            "CreateSchemaCreateSchemaProviderframeworkonEventC776930C",
             "Arn",
           ],
         },
@@ -204,10 +206,10 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       "Type": "AWS::CloudFormation::CustomResource",
       "UpdateReplacePolicy": "Delete",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerFunction176EF9F2": {
+    "CreateSchemaCreateSchemaFunctionDF06AFDF": {
       "DependsOn": [
-        "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleDefaultPolicy3DB64C7D",
-        "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleABB8B645",
+        "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A",
+        "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
       ],
       "Properties": {
         "Architectures": [
@@ -217,9 +219,9 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "446aa7db5dbb5fa3a4febc43f15921f7555010e450f6a9c8859ba8fcc1346843.zip",
+          "S3Key": "f647be00a7690aa19020885b314be56b82c461fb874e1069e99ae900abad1191.zip",
         },
-        "Description": "src/funcs/aurora-database-create-owner.lambda.ts",
+        "Description": "src/funcs/create-schema.lambda.ts",
         "Environment": {
           "Variables": {
             "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
@@ -233,7 +235,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
         },
         "Role": {
           "Fn::GetAtt": [
-            "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleABB8B645",
+            "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
             "Arn",
           ],
         },
@@ -242,7 +244,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       },
       "Type": "AWS::Lambda::Function",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleABB8B645": {
+    "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -273,7 +275,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleDefaultPolicy3DB64C7D": {
+    "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -319,49 +321,22 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
                 ],
               },
             },
-            {
-              "Action": "rds-data:ExecuteStatement",
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":rds:",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":cluster:",
-                    {
-                      "Ref": "ClusterEB0386A7",
-                    },
-                  ],
-                ],
-              },
-            },
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleDefaultPolicy3DB64C7D",
+        "PolicyName": "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A",
         "Roles": [
           {
-            "Ref": "CreateOwnerAuroraDatabaseCreateOwnerFunctionServiceRoleABB8B645",
+            "Ref": "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEvent16172B35": {
+    "CreateSchemaCreateSchemaProviderframeworkonEventC776930C": {
       "DependsOn": [
-        "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleDefaultPolicy267BCBF6",
-        "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleB2668225",
+        "CreateSchemaCreateSchemaProviderframeworkonEventServiceRoleDefaultPolicyD3F7681C",
+        "CreateSchemaCreateSchemaProviderframeworkonEventServiceRole92DCC553",
       ],
       "Properties": {
         "Code": {
@@ -370,12 +345,12 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           },
           "S3Key": "bdc104ed9cab1b5b6421713c8155f0b753380595356f710400609664d3635eca.zip",
         },
-        "Description": "AWS CDK resource provider framework - onEvent (TestStack/CreateOwner/AuroraDatabaseCreateOwnerProvider)",
+        "Description": "AWS CDK resource provider framework - onEvent (TestStack/CreateSchema/CreateSchemaProvider)",
         "Environment": {
           "Variables": {
             "USER_ON_EVENT_FUNCTION_ARN": {
               "Fn::GetAtt": [
-                "CreateOwnerAuroraDatabaseCreateOwnerFunction176EF9F2",
+                "CreateSchemaCreateSchemaFunctionDF06AFDF",
                 "Arn",
               ],
             },
@@ -388,7 +363,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
         },
         "Role": {
           "Fn::GetAtt": [
-            "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleB2668225",
+            "CreateSchemaCreateSchemaProviderframeworkonEventServiceRole92DCC553",
             "Arn",
           ],
         },
@@ -397,7 +372,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       },
       "Type": "AWS::Lambda::Function",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleB2668225": {
+    "CreateSchemaCreateSchemaProviderframeworkonEventServiceRole92DCC553": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -428,7 +403,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
       },
       "Type": "AWS::IAM::Role",
     },
-    "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleDefaultPolicy267BCBF6": {
+    "CreateSchemaCreateSchemaProviderframeworkonEventServiceRoleDefaultPolicyD3F7681C": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -438,7 +413,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "CreateOwnerAuroraDatabaseCreateOwnerFunction176EF9F2",
+                    "CreateSchemaCreateSchemaFunctionDF06AFDF",
                     "Arn",
                   ],
                 },
@@ -448,7 +423,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "CreateOwnerAuroraDatabaseCreateOwnerFunction176EF9F2",
+                          "CreateSchemaCreateSchemaFunctionDF06AFDF",
                           "Arn",
                         ],
                       },
@@ -463,7 +438,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "CreateOwnerAuroraDatabaseCreateOwnerFunction176EF9F2",
+                  "CreateSchemaCreateSchemaFunctionDF06AFDF",
                   "Arn",
                 ],
               },
@@ -471,10 +446,10 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleDefaultPolicy267BCBF6",
+        "PolicyName": "CreateSchemaCreateSchemaProviderframeworkonEventServiceRoleDefaultPolicyD3F7681C",
         "Roles": [
           {
-            "Ref": "CreateOwnerAuroraDatabaseCreateOwnerProviderframeworkonEventServiceRoleB2668225",
+            "Ref": "CreateSchemaCreateSchemaProviderframeworkonEventServiceRole92DCC553",
           },
         ],
       },
