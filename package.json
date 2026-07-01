@@ -10,6 +10,8 @@
     "bundle": "projen bundle",
     "bundle:funcs/aurora-database-create-owner.lambda": "projen bundle:funcs/aurora-database-create-owner.lambda",
     "bundle:funcs/aurora-database-create-owner.lambda:watch": "projen bundle:funcs/aurora-database-create-owner.lambda:watch",
+    "bundle:funcs/create-schema.lambda": "projen bundle:funcs/create-schema.lambda",
+    "bundle:funcs/create-schema.lambda:watch": "projen bundle:funcs/create-schema.lambda:watch",
     "clobber": "projen clobber",
     "compat": "projen compat",
     "compile": "projen compile",

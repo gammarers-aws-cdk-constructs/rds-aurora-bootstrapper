@@ -53,4 +53,5 @@ junit.xml
 !/API.md
 /assets/
 !/src/funcs/aurora-database-create-owner-function.ts
+!/src/funcs/create-schema-function.ts
 !/.projenrc.ts

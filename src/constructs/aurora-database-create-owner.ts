@@ -6,6 +6,7 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import { AuroraDatabaseCreateOwnerFunction } from '../funcs/aurora-database-create-owner-function';
+import { assertSafePostgresqlIdentifier } from './libs/postgresql/assert-identifier';
 
 /**
  * Properties for {@link AuroraDatabaseCreateOwner}.
@@ -20,7 +21,10 @@ export interface AuroraDatabaseCreateOwnerProps {
   readonly dbCluster: DatabaseCluster;
   /** Name of the PostgreSQL database targeted by the custom resource. */
   readonly dbName: string;
-  /** Username of the owner role to create (`NOLOGIN`, `NOINHERIT`). */
+  /**
+   * Username of the owner role to create (`NOLOGIN`, `NOINHERIT`).
+   * Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
+   */
   readonly ownerUsername: string;
 }
 
@@ -37,11 +41,13 @@ export class AuroraDatabaseCreateOwner extends Construct {
    * @param scope - Parent construct.
    * @param id - Construct identifier.
    * @param props - Configuration for the database owner role.
+   * @throws Error when `ownerUsername` fails identifier validation.
    */
   constructor(scope: Construct, id: string, props: AuroraDatabaseCreateOwnerProps) {
     super(scope, id);
 
     const { dbMasterUserCredentials, dbCluster, dbName, ownerUsername } = props;
+    assertSafePostgresqlIdentifier(ownerUsername, 'ownerUsername');
 
     // 👇 Create database owner.
     const createOwnerFunction = new AuroraDatabaseCreateOwnerFunction(this, 'AuroraDatabaseCreateOwnerFunction', {

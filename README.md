@@ -9,10 +9,12 @@ AWS CDK constructs for bootstrapping Aurora PostgreSQL databases.
 ## Features
 
 - **`AuroraDatabaseCreateOwner`** — provisions a PostgreSQL owner role on an Aurora cluster via the RDS Data API
-- Creates a `NOLOGIN NOINHERIT` role and grants it to the master user inside a transaction
-- Idempotent on Create — skips role creation when the owner role already exists
+- **`AuroraDatabaseCreateSchema`** — creates a PostgreSQL schema, assigns ownership to an existing owner role, and optionally drops the `public` schema with `CASCADE`
+- Creates a `NOLOGIN NOINHERIT` owner role and grants it to the master user inside a transaction
+- Idempotent owner creation — skips role creation when the owner role already exists
+- Validates PostgreSQL identifiers at synthesis time (`ownerUsername`, `schemaName`)
 - Master username is resolved from the credentials secret through a CloudFormation dynamic reference
-- Bundled Lambda custom resource with IAM permissions and Secrets Manager read access configured automatically
+- Bundled Lambda custom resources with IAM permissions and Secrets Manager read access configured automatically
 
 ## Installation
 
@@ -26,6 +28,8 @@ yarn add rds-aurora-bootstrapper aws-cdk-lib constructs
 
 ## Usage
 
+Create the owner role first, then create the application schema:
+
 ```typescript
 import { Stack } from 'aws-cdk-lib';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
@@ -37,7 +41,10 @@ import {
 } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
-import { AuroraDatabaseCreateOwner } from 'rds-aurora-bootstrapper';
+import {
+  AuroraDatabaseCreateOwner,
+  AuroraDatabaseCreateSchema,
+} from 'rds-aurora-bootstrapper';
 
 export class MyStack extends Stack {
   constructor(scope: Construct, id: string) {
@@ -53,12 +60,22 @@ export class MyStack extends Stack {
     });
     const masterUserSecret = new Secret(this, 'MasterUserSecret');
 
-    new AuroraDatabaseCreateOwner(this, 'CreateOwner', {
+    const createOwner = new AuroraDatabaseCreateOwner(this, 'CreateOwner', {
       dbMasterUserCredentials: masterUserSecret,
       dbCluster: cluster,
       dbName: 'appdb',
       ownerUsername: 'app_owner',
     });
+
+    const createSchema = new AuroraDatabaseCreateSchema(this, 'CreateSchema', {
+      dbMasterUserCredentials: masterUserSecret,
+      dbCluster: cluster,
+      dbName: 'appdb',
+      ownerUsername: 'app_owner',
+      schemaName: 'app_schema',
+      isDropPublicSchema: true,
+    });
+    createSchema.node.addDependency(createOwner);
   }
 }
 ```
@@ -72,7 +89,18 @@ export class MyStack extends Stack {
 | `dbMasterUserCredentials` | `Secret` | Secrets Manager secret with Aurora master credentials. The `username` field is passed to the custom resource via a dynamic reference. |
 | `dbCluster` | `DatabaseCluster` | Aurora database cluster where the owner role is created. |
 | `dbName` | `string` | PostgreSQL database name targeted by the custom resource. |
-| `ownerUsername` | `string` | Username of the owner role to create (`NOLOGIN`, `NOINHERIT`). |
+| `ownerUsername` | `string` | Username of the owner role to create (`NOLOGIN`, `NOINHERIT`). Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+
+### `AuroraDatabaseCreateSchemaProps`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `dbMasterUserCredentials` | `Secret` | Secrets Manager secret with Aurora master credentials. The `username` field is passed to the custom resource via a dynamic reference. |
+| `dbCluster` | `DatabaseCluster` | Aurora database cluster where the schema is created. |
+| `dbName` | `string` | PostgreSQL database name targeted by the custom resource. |
+| `ownerUsername` | `string` | Username of the existing owner role that will own the new schema. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+| `schemaName` | `string` | Name of the PostgreSQL schema to create. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+| `isDropPublicSchema` | `boolean` | When `true`, drops the `public` schema with `CASCADE` after creating the target schema. |
 
 ## Requirements
 
