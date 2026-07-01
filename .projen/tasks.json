@@ -52,6 +52,9 @@
       "steps": [
         {
           "spawn": "bundle:funcs/aurora-database-create-owner.lambda"
+        },
+        {
+          "spawn": "bundle:funcs/create-schema.lambda"
         }
       ]
     },
@@ -70,6 +73,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/funcs/aurora-database-create-owner.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/aurora-database-create-owner.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
+        }
+      ]
+    },
+    "bundle:funcs/create-schema.lambda": {
+      "name": "bundle:funcs/create-schema.lambda",
+      "description": "Create a JavaScript bundle from src/funcs/create-schema.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/funcs/create-schema.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-schema.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap"
+        }
+      ]
+    },
+    "bundle:funcs/create-schema.lambda:watch": {
+      "name": "bundle:funcs/create-schema.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/funcs/create-schema.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/funcs/create-schema.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-schema.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
         }
       ]
     },
