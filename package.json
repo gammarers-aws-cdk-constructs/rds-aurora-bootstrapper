@@ -7,6 +7,7 @@
   "scripts": {
     "build": "projen build",
     "bump": "projen bump",
+    "bump:releasable-commits": "projen bump:releasable-commits",
     "bundle": "projen bundle",
     "bundle:funcs/aurora-database-create-owner.lambda": "projen bundle:funcs/aurora-database-create-owner.lambda",
     "bundle:funcs/aurora-database-create-owner.lambda:watch": "projen bundle:funcs/aurora-database-create-owner.lambda:watch",
@@ -57,11 +58,11 @@
     "jest": "^30.4.2",
     "jest-junit": "^17",
     "jsii": "5.9.x",
-    "jsii-diff": "^1.138.0",
+    "jsii-diff": "^1.139.0",
     "jsii-docgen": "^10.5.0",
-    "jsii-pacmak": "^1.138.0",
+    "jsii-pacmak": "^1.139.0",
     "jsii-rosetta": "5.9.x",
-    "projen": "^0.101.11",
+    "projen": "^0.101.16",
     "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "5.9.x"
