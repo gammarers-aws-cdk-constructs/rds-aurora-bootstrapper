@@ -17,6 +17,7 @@
     "projenrc/tsconfig.json",
     "src/funcs/aurora-database-create-owner-function.ts",
     "src/funcs/create-schema-function.ts",
+    "src/funcs/create-user-function.ts",
     "test/tsconfig.json",
     "tsconfig.json"
   ],

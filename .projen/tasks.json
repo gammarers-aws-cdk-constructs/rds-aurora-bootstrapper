@@ -77,6 +77,9 @@
         },
         {
           "spawn": "bundle:funcs/create-schema.lambda"
+        },
+        {
+          "spawn": "bundle:funcs/create-user.lambda"
         }
       ]
     },
@@ -113,6 +116,24 @@
       "steps": [
         {
           "exec": "esbuild --bundle src/funcs/create-schema.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-schema.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
+        }
+      ]
+    },
+    "bundle:funcs/create-user.lambda": {
+      "name": "bundle:funcs/create-user.lambda",
+      "description": "Create a JavaScript bundle from src/funcs/create-user.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/funcs/create-user.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-user.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap"
+        }
+      ]
+    },
+    "bundle:funcs/create-user.lambda:watch": {
+      "name": "bundle:funcs/create-user.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/funcs/create-user.lambda.ts",
+      "steps": [
+        {
+          "exec": "esbuild --bundle src/funcs/create-user.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-user.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
         }
       ]
     },
