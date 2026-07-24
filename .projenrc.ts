@@ -4,10 +4,10 @@ const project = new awscdk.AwsCdkConstructLibrary({
   authorAddress: 'yicr@users.noreply.github.com',
   cdkVersion: '2.232.0',
   defaultReleaseBranch: 'main',
-  typescriptVersion: '5.9.x',
-  jsiiVersion: '5.9.x',
+  typescriptVersion: '6.0.x',
+  jsiiVersion: '6.0.x',
   name: 'rds-aurora-bootstrapper',
-  packageManager: javascript.NodePackageManager.YARN_CLASSIC,
+  packageManager: javascript.NodePackageManager.NPM,
   projenrcTs: true,
   repositoryUrl: 'https://github.com/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper.git',
   devDeps: [
