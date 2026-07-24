@@ -301,6 +301,165 @@ The tree node.
 ---
 
 
+### AuroraDatabaseCreateUser <a name="AuroraDatabaseCreateUser" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser"></a>
+
+CDK construct that provisions a PostgreSQL application user on an Aurora cluster using a custom resource backed by the RDS Data API.
+
+On Create, the handler creates a `LOGIN` role from
+{@link AuroraDatabaseCreateUserProps.targetUserCredentials} when the role is
+missing, grants `CONNECT` on the database, `USAGE` on the schema, DML on
+existing tables, and default privileges for future tables owned by
+{@link AuroraDatabaseCreateUserProps.ownerUsername}. Role creation is
+idempotent when the username already exists.
+
+The master username is derived from the `username` field of
+{@link AuroraDatabaseCreateUserProps.dbMasterUserCredentials} through a
+Secrets Manager dynamic reference; callers do not pass it explicitly.
+
+Ensure {@link AuroraDatabaseCreateUserProps.ownerUsername} and
+{@link AuroraDatabaseCreateUserProps.schemaName} already exist (for example
+via {@link AuroraDatabaseCreateOwner } and {@link AuroraDatabaseCreateSchema })
+before this resource runs.
+
+#### Initializers <a name="Initializers" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer"></a>
+
+```typescript
+import { AuroraDatabaseCreateUser } from 'rds-aurora-bootstrapper'
+
+new AuroraDatabaseCreateUser(scope: Construct, id: string, props: AuroraDatabaseCreateUserProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | - Parent construct. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.id">id</a></code> | <code>string</code> | - Construct identifier. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.props">props</a></code> | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps">AuroraDatabaseCreateUserProps</a></code> | - Configuration for the database user. |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+Parent construct.
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+Construct identifier.
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps">AuroraDatabaseCreateUserProps</a>
+
+Configuration for the database user.
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.with">with</a></code> | Applies one or more mixins to this construct. |
+
+---
+
+##### `toString` <a name="toString" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.isConstruct"></a>
+
+```typescript
+import { AuroraDatabaseCreateUser } from 'rds-aurora-bootstrapper'
+
+AuroraDatabaseCreateUser.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUser.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+
 ## Structs <a name="Structs" id="Structs"></a>
 
 ### AuroraDatabaseCreateOwnerProps <a name="AuroraDatabaseCreateOwnerProps" id="rds-aurora-bootstrapper.AuroraDatabaseCreateOwnerProps"></a>
@@ -478,6 +637,111 @@ public readonly schemaName: string;
 Name of the PostgreSQL schema to create.
 
 Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+
+---
+
+### AuroraDatabaseCreateUserProps <a name="AuroraDatabaseCreateUserProps" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps"></a>
+
+Properties for {@link AuroraDatabaseCreateUser}.
+
+#### Initializer <a name="Initializer" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.Initializer"></a>
+
+```typescript
+import { AuroraDatabaseCreateUserProps } from 'rds-aurora-bootstrapper'
+
+const auroraDatabaseCreateUserProps: AuroraDatabaseCreateUserProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbCluster">dbCluster</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseCluster</code> | Aurora database cluster where the user role is created. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbMasterUserCredentials">dbMasterUserCredentials</a></code> | <code>aws-cdk-lib.aws_secretsmanager.Secret</code> | Secrets Manager secret holding the Aurora master user credentials. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbName">dbName</a></code> | <code>string</code> | Name of the PostgreSQL database targeted by the custom resource. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.ownerUsername">ownerUsername</a></code> | <code>string</code> | Username of the existing owner role used for default privileges. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.schemaName">schemaName</a></code> | <code>string</code> | Name of the PostgreSQL schema that the new user is granted access to. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.targetUserCredentials">targetUserCredentials</a></code> | <code>aws-cdk-lib.aws_secretsmanager.Secret</code> | Secrets Manager secret holding the target application user credentials. |
+
+---
+
+##### `dbCluster`<sup>Required</sup> <a name="dbCluster" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbCluster"></a>
+
+```typescript
+public readonly dbCluster: DatabaseCluster;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.DatabaseCluster
+
+Aurora database cluster where the user role is created.
+
+---
+
+##### `dbMasterUserCredentials`<sup>Required</sup> <a name="dbMasterUserCredentials" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbMasterUserCredentials"></a>
+
+```typescript
+public readonly dbMasterUserCredentials: Secret;
+```
+
+- *Type:* aws-cdk-lib.aws_secretsmanager.Secret
+
+Secrets Manager secret holding the Aurora master user credentials.
+
+The `username` field is passed to the custom resource via a dynamic reference.
+
+---
+
+##### `dbName`<sup>Required</sup> <a name="dbName" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.dbName"></a>
+
+```typescript
+public readonly dbName: string;
+```
+
+- *Type:* string
+
+Name of the PostgreSQL database targeted by the custom resource.
+
+---
+
+##### `ownerUsername`<sup>Required</sup> <a name="ownerUsername" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.ownerUsername"></a>
+
+```typescript
+public readonly ownerUsername: string;
+```
+
+- *Type:* string
+
+Username of the existing owner role used for default privileges.
+
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+
+---
+
+##### `schemaName`<sup>Required</sup> <a name="schemaName" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.schemaName"></a>
+
+```typescript
+public readonly schemaName: string;
+```
+
+- *Type:* string
+
+Name of the PostgreSQL schema that the new user is granted access to.
+
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+
+---
+
+##### `targetUserCredentials`<sup>Required</sup> <a name="targetUserCredentials" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUserProps.property.targetUserCredentials"></a>
+
+```typescript
+public readonly targetUserCredentials: Secret;
+```
+
+- *Type:* aws-cdk-lib.aws_secretsmanager.Secret
+
+Secrets Manager secret holding the target application user credentials.
+
+The handler reads `username` and `password` at runtime to create the role.
 
 ---
 
