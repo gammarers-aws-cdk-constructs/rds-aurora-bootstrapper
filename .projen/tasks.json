@@ -88,7 +88,17 @@
       "description": "Create a JavaScript bundle from src/funcs/aurora-database-create-owner.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/aurora-database-create-owner.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/aurora-database-create-owner.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/aurora-database-create-owner.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/aurora-database-create-owner.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap"
+          ]
         }
       ]
     },
@@ -97,7 +107,18 @@
       "description": "Continuously update the JavaScript bundle from src/funcs/aurora-database-create-owner.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/aurora-database-create-owner.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/aurora-database-create-owner.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/aurora-database-create-owner.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/aurora-database-create-owner.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap",
+            "--watch"
+          ]
         }
       ]
     },
@@ -106,7 +127,17 @@
       "description": "Create a JavaScript bundle from src/funcs/create-schema.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/create-schema.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-schema.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-schema.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-schema.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap"
+          ]
         }
       ]
     },
@@ -115,7 +146,18 @@
       "description": "Continuously update the JavaScript bundle from src/funcs/create-schema.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/create-schema.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-schema.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-schema.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-schema.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap",
+            "--watch"
+          ]
         }
       ]
     },
@@ -124,7 +166,17 @@
       "description": "Create a JavaScript bundle from src/funcs/create-user.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/create-user.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-user.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-user.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-user.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap"
+          ]
         }
       ]
     },
@@ -133,7 +185,18 @@
       "description": "Continuously update the JavaScript bundle from src/funcs/create-user.lambda.ts",
       "steps": [
         {
-          "exec": "esbuild --bundle src/funcs/create-user.lambda.ts --target=\"node24\" --platform=\"node\" --outfile=\"assets/funcs/create-user.lambda/index.js\" --tsconfig=\"test/tsconfig.json\" --external:@aws-sdk/* --sourcemap --watch"
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-user.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-user.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap",
+            "--watch"
+          ]
         }
       ]
     },
@@ -145,22 +208,35 @@
       },
       "steps": [
         {
-          "exec": "git checkout -b scratch",
+          "execArgs": [
+            "git",
+            "checkout",
+            "-b",
+            "scratch"
+          ],
           "name": "save current HEAD in \"scratch\" branch"
         },
         {
-          "exec": "git checkout $BRANCH"
+          "exec": "git checkout \"$BRANCH\""
         },
         {
-          "exec": "git fetch origin",
+          "execArgs": [
+            "git",
+            "fetch",
+            "origin"
+          ],
           "name": "fetch latest changes from origin"
         },
         {
-          "exec": "git reset --hard origin/$BRANCH",
+          "exec": "git reset --hard \"origin/$BRANCH\"",
           "name": "hard reset to origin commit"
         },
         {
-          "exec": "git clean -fdx",
+          "execArgs": [
+            "git",
+            "clean",
+            "-fdx"
+          ],
           "name": "clean all untracked files"
         },
         {
@@ -174,7 +250,13 @@
       "description": "Perform API compatibility check against latest version",
       "steps": [
         {
-          "exec": "jsii-diff npm:$(node -p \"require('./package.json').name\") -k --ignore-file .compatignore || (echo \"\nUNEXPECTED BREAKING CHANGES: add keys such as 'removed:constructs.Node.of' to .compatignore to skip.\n\" && exit 1)"
+          "execArgs": [
+            "jsii-diff",
+            "npm:rds-aurora-bootstrapper",
+            "-k",
+            "--ignore-file",
+            ".compatignore"
+          ]
         }
       ]
     },
@@ -235,7 +317,19 @@
       },
       "steps": [
         {
-          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ src test build-tools projenrc .projenrc.ts",
+          "execArgs": [
+            "eslint",
+            "--ext",
+            ".ts,.tsx",
+            "--fix",
+            "--no-error-on-unmatched-pattern",
+            "$@",
+            "src",
+            "test",
+            "build-tools",
+            "projenrc",
+            ".projenrc.ts"
+          ],
           "receiveArgs": true
         }
       ]
@@ -325,7 +419,11 @@
       },
       "steps": [
         {
-          "exec": "rm -fr dist"
+          "execArgs": [
+            "rm",
+            "-fr",
+            "dist"
+          ]
         },
         {
           "spawn": "bump"
@@ -346,7 +444,12 @@
       "description": "Run tests",
       "steps": [
         {
-          "exec": "jest --silent --passWithNoTests --updateSnapshot",
+          "execArgs": [
+            "jest",
+            "--silent",
+            "--passWithNoTests",
+            "--updateSnapshot"
+          ],
           "receiveArgs": true
         },
         {
@@ -359,7 +462,10 @@
       "description": "Run jest in watch mode",
       "steps": [
         {
-          "exec": "jest --watch"
+          "execArgs": [
+            "jest",
+            "--watch"
+          ]
         }
       ]
     },
