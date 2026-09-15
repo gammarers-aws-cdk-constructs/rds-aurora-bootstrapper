@@ -76,6 +76,9 @@
           "spawn": "bundle:funcs/aurora-database-create-owner.lambda"
         },
         {
+          "spawn": "bundle:funcs/create-migrator.lambda"
+        },
+        {
           "spawn": "bundle:funcs/create-schema.lambda"
         },
         {
@@ -114,6 +117,45 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/aurora-database-create-owner.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap",
+            "--watch"
+          ]
+        }
+      ]
+    },
+    "bundle:funcs/create-migrator.lambda": {
+      "name": "bundle:funcs/create-migrator.lambda",
+      "description": "Create a JavaScript bundle from src/funcs/create-migrator.lambda.ts",
+      "steps": [
+        {
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-migrator.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-migrator.lambda/index.js",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap"
+          ]
+        }
+      ]
+    },
+    "bundle:funcs/create-migrator.lambda:watch": {
+      "name": "bundle:funcs/create-migrator.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/funcs/create-migrator.lambda.ts",
+      "steps": [
+        {
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-migrator.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-migrator.lambda/index.js",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap",
