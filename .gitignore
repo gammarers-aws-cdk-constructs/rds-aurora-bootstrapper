@@ -56,4 +56,5 @@ junit.xml
 !/src/funcs/create-migrator-function.ts
 !/src/funcs/create-schema-function.ts
 !/src/funcs/create-user-function.ts
+!/.editorconfig
 !/.projenrc.ts

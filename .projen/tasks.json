@@ -556,6 +556,7 @@
             "update",
             "@aws-sdk/client-rds-data",
             "@aws-sdk/client-secrets-manager",
+            "@gammarers/projen-projects",
             "@stylistic/eslint-plugin",
             "@types/aws-lambda",
             "@types/jest",
