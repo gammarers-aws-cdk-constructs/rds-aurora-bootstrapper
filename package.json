@@ -11,6 +11,8 @@
     "bundle": "projen bundle",
     "bundle:funcs/aurora-database-create-owner.lambda": "projen bundle:funcs/aurora-database-create-owner.lambda",
     "bundle:funcs/aurora-database-create-owner.lambda:watch": "projen bundle:funcs/aurora-database-create-owner.lambda:watch",
+    "bundle:funcs/create-migrator.lambda": "projen bundle:funcs/create-migrator.lambda",
+    "bundle:funcs/create-migrator.lambda:watch": "projen bundle:funcs/create-migrator.lambda:watch",
     "bundle:funcs/create-schema.lambda": "projen bundle:funcs/create-schema.lambda",
     "bundle:funcs/create-schema.lambda:watch": "projen bundle:funcs/create-schema.lambda:watch",
     "bundle:funcs/create-user.lambda": "projen bundle:funcs/create-user.lambda",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@aws-sdk/client-rds-data": "^3.743.0",
     "@aws-sdk/client-secrets-manager": "^3.743.0",
+    "@gammarers/projen-projects": "^0.2.4",
     "@stylistic/eslint-plugin": "^2",
     "@types/aws-lambda": "^8.10.161",
     "@types/jest": "^30.0.0",

@@ -11,7 +11,8 @@ AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Dat
 - **`AuroraDatabaseCreateOwner`** — creates a `NOLOGIN NOINHERIT` owner role and grants it to the master user
 - **`AuroraDatabaseCreateSchema`** — creates a schema, assigns ownership to an existing owner role, and optionally drops the `public` schema with `CASCADE`
 - **`AuroraDatabaseCreateUser`** — creates a `LOGIN` application user from a Secrets Manager credential secret, grants `CONNECT` / schema `USAGE` / table DML, and sets default privileges for the owner role
-- Idempotent owner and user role creation — skips creation when the role already exists
+- **`AuroraDatabaseCreateMigrator`** — creates a `LOGIN` migrator user from a Secrets Manager credential secret, grants `CONNECT`, grants membership in the owner role, and sets `search_path` to the target schema
+- Idempotent owner, user, and migrator role creation — skips creation when the role already exists
 - Validates PostgreSQL identifiers at synthesis time (`ownerUsername`, `schemaName`)
 - Resolves the master username from the credentials secret through a CloudFormation dynamic reference
 - Bundled Lambda custom resources with IAM permissions and Secrets Manager read access configured automatically
@@ -28,7 +29,7 @@ yarn add rds-aurora-bootstrapper aws-cdk-lib constructs
 
 ## Usage
 
-Provision resources in order: owner role → schema → application user.
+Provision resources in order: owner role → schema → migrator user → application user.
 
 ```typescript
 import { Stack } from 'aws-cdk-lib';
@@ -44,6 +45,7 @@ import { Construct } from 'constructs';
 import {
   AuroraDatabaseCreateOwner,
   AuroraDatabaseCreateSchema,
+  AuroraDatabaseCreateMigrator,
   AuroraDatabaseCreateUser,
 } from 'rds-aurora-bootstrapper';
 
@@ -60,6 +62,13 @@ export class MyStack extends Stack {
       writer: ClusterInstance.provisioned('writer'),
     });
     const masterUserSecret = new Secret(this, 'MasterUserSecret');
+    const migratorUserSecret = new Secret(this, 'MigratorUserSecret', {
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({ username: 'app_migrator' }),
+        generateStringKey: 'password',
+        excludePunctuation: true,
+      },
+    });
     const appUserSecret = new Secret(this, 'AppUserSecret', {
       generateSecretString: {
         secretStringTemplate: JSON.stringify({ username: 'app_user' }),
@@ -84,6 +93,16 @@ export class MyStack extends Stack {
       isDropPublicSchema: true,
     });
     createSchema.node.addDependency(createOwner);
+
+    const createMigrator = new AuroraDatabaseCreateMigrator(this, 'CreateMigrator', {
+      dbMasterUserCredentials: masterUserSecret,
+      migratorUserCredentials: migratorUserSecret,
+      dbCluster: cluster,
+      dbName: 'appdb',
+      ownerUsername: 'app_owner',
+      schemaName: 'app_schema',
+    });
+    createMigrator.node.addDependency(createSchema);
 
     const createUser = new AuroraDatabaseCreateUser(this, 'CreateUser', {
       dbMasterUserCredentials: masterUserSecret,
@@ -120,6 +139,17 @@ export class MyStack extends Stack {
 | `schemaName` | `string` | Name of the PostgreSQL schema to create. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
 | `isDropPublicSchema` | `boolean` | When `true`, drops the `public` schema with `CASCADE` after creating the target schema. |
 
+### `AuroraDatabaseCreateMigratorProps`
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `dbMasterUserCredentials` | `Secret` | Secrets Manager secret with Aurora master credentials. The `username` field is passed to the custom resource via a dynamic reference. |
+| `migratorUserCredentials` | `Secret` | Secrets Manager secret with the migrator user credentials (`username` and `password`). Used at runtime to create the `LOGIN` role. |
+| `dbCluster` | `DatabaseCluster` | Aurora database cluster where the migrator role is created. |
+| `dbName` | `string` | PostgreSQL database name targeted by the custom resource. |
+| `ownerUsername` | `string` | Username of the existing owner role granted to the migrator. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+| `schemaName` | `string` | Name of the PostgreSQL schema used as the migrator's `search_path`. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+
 ### `AuroraDatabaseCreateUserProps`
 
 | Property | Type | Description |
@@ -137,7 +167,7 @@ export class MyStack extends Stack {
 - `aws-cdk-lib` `^2.232.0`
 - `constructs` `^10.5.1`
 - Aurora PostgreSQL cluster with the [RDS Data API](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/data-api.html) enabled
-- Secrets Manager secrets containing `username` and `password` fields (master credentials, and application user credentials for `AuroraDatabaseCreateUser`)
+- Secrets Manager secrets containing `username` and `password` fields (master credentials, and application / migrator user credentials for `AuroraDatabaseCreateUser` / `AuroraDatabaseCreateMigrator`)
 
 ## License
 
