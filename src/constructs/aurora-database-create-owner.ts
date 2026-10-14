@@ -5,7 +5,7 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { AuroraDatabaseCreateOwnerFunction } from '../funcs/aurora-database-create-owner-function';
+import { CreateOwnerFunction } from '../funcs/create-owner-function';
 import { assertSafePostgresqlIdentifier } from './libs/postgresql/assert-identifier';
 
 /**
@@ -50,7 +50,7 @@ export class AuroraDatabaseCreateOwner extends Construct {
     assertSafePostgresqlIdentifier(ownerUsername, 'ownerUsername');
 
     // 👇 Create database owner.
-    const createOwnerFunction = new AuroraDatabaseCreateOwnerFunction(this, 'AuroraDatabaseCreateOwnerFunction', {
+    const createOwnerFunction = new CreateOwnerFunction(this, 'CreateOwnerFunction', {
       architecture: Architecture.ARM_64,
       timeout: Duration.minutes(1),
       loggingFormat: LoggingFormat.JSON,
@@ -72,12 +72,12 @@ export class AuroraDatabaseCreateOwner extends Construct {
       resources: [dbCluster.clusterArn],
     }));
 
-    const auroraDatabaseCreateOwnerProvider = new Provider(this, 'AuroraDatabaseCreateOwnerProvider', {
+    const createOwnerProvider = new Provider(this, 'CreateOwnerProvider', {
       onEventHandler: createOwnerFunction,
     });
 
-    const createOwner = new CustomResource(this, 'AuroraDatabaseCreateOwnerCustomResource', {
-      serviceToken: auroraDatabaseCreateOwnerProvider.serviceToken,
+    const createOwner = new CustomResource(this, 'CreateOwnerCustomResource', {
+      serviceToken: createOwnerProvider.serviceToken,
       serviceTimeout: Duration.seconds(10),
       properties: {
         MasterUserSecretArn: dbMasterUserCredentials.secretArn,
