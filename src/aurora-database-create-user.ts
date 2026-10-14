@@ -5,8 +5,34 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { CreateUserFunction } from '../funcs/create-user-function';
-import { assertSafePostgresqlIdentifier } from './libs/postgresql/assert-identifier';
+import { CreateUserFunction } from './funcs/create-user-function';
+import {
+  RESOURCE_PROPERTY_CLUSTER_ARN,
+  RESOURCE_PROPERTY_DATABASE_NAME,
+  RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+  RESOURCE_PROPERTY_SCHEMA_NAME,
+  RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN,
+  SAFE_POSTGRESQL_IDENTIFIER_PATTERN,
+} from './settings/consts';
+
+/**
+ * Rejects identifiers that cannot be safely quoted into SQL.
+ *
+ * @param name - Candidate identifier.
+ * @param label - Field name used in error messages.
+ * @throws Error when `name` does not match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
+ */
+const assertSafePostgresqlIdentifier = (name: string, label: string): void => {
+  if (SAFE_POSTGRESQL_IDENTIFIER_PATTERN.test(name)) {
+    return;
+  }
+
+  throw new Error(
+    `${label} must match ${SAFE_POSTGRESQL_IDENTIFIER_PATTERN}: got ${JSON.stringify(name)}`,
+  );
+};
 
 /**
  * Properties for {@link AuroraDatabaseCreateUser}.
@@ -109,13 +135,13 @@ export class AuroraDatabaseCreateUser extends Construct {
       serviceToken: createUserProvider.serviceToken,
       serviceTimeout: Duration.seconds(10),
       properties: {
-        MasterUserSecretArn: dbMasterUserCredentials.secretArn,
-        MasterUsername: dbMasterUserCredentials.secretValueFromJson('username').unsafeUnwrap(),
-        DatabaseName: dbName,
-        ClusterArn: dbCluster.clusterArn,
-        TargetUserSecretArn: targetUserCredentials.secretArn,
-        OwnerUsername: ownerUsername,
-        SchemaName: schemaName,
+        [RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN]: dbMasterUserCredentials.secretArn,
+        [RESOURCE_PROPERTY_MASTER_USERNAME]: dbMasterUserCredentials.secretValueFromJson('username').unsafeUnwrap(),
+        [RESOURCE_PROPERTY_DATABASE_NAME]: dbName,
+        [RESOURCE_PROPERTY_CLUSTER_ARN]: dbCluster.clusterArn,
+        [RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN]: targetUserCredentials.secretArn,
+        [RESOURCE_PROPERTY_OWNER_USERNAME]: ownerUsername,
+        [RESOURCE_PROPERTY_SCHEMA_NAME]: schemaName,
       },
     });
     createUser.node.addDependency(dbCluster);

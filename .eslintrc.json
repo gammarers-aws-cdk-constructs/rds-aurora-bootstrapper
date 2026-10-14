@@ -158,8 +158,8 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
-          "src/funcs/aurora-database-create-owner.lambda.ts",
           "src/funcs/create-migrator.lambda.ts",
+          "src/funcs/create-owner.lambda.ts",
           "src/funcs/create-schema.lambda.ts",
           "src/funcs/create-user.lambda.ts",
           ".projenrc.ts",
@@ -217,6 +217,14 @@
           "constructor",
           "method"
         ]
+      }
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 160,
+        "ignoreUrls": true,
+        "ignoreStrings": true
       }
     ]
   },

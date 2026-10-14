@@ -73,55 +73,16 @@
       "description": "Prepare assets",
       "steps": [
         {
-          "spawn": "bundle:funcs/aurora-database-create-owner.lambda"
+          "spawn": "bundle:funcs/create-migrator.lambda"
         },
         {
-          "spawn": "bundle:funcs/create-migrator.lambda"
+          "spawn": "bundle:funcs/create-owner.lambda"
         },
         {
           "spawn": "bundle:funcs/create-schema.lambda"
         },
         {
           "spawn": "bundle:funcs/create-user.lambda"
-        }
-      ]
-    },
-    "bundle:funcs/aurora-database-create-owner.lambda": {
-      "name": "bundle:funcs/aurora-database-create-owner.lambda",
-      "description": "Create a JavaScript bundle from src/funcs/aurora-database-create-owner.lambda.ts",
-      "steps": [
-        {
-          "execArgs": [
-            "esbuild",
-            "--bundle",
-            "src/funcs/aurora-database-create-owner.lambda.ts",
-            "--target=node24",
-            "--platform=node",
-            "--outfile=assets/funcs/aurora-database-create-owner.lambda/index.js",
-            "--tsconfig=test/tsconfig.json",
-            "--external:@aws-sdk/*",
-            "--sourcemap"
-          ]
-        }
-      ]
-    },
-    "bundle:funcs/aurora-database-create-owner.lambda:watch": {
-      "name": "bundle:funcs/aurora-database-create-owner.lambda:watch",
-      "description": "Continuously update the JavaScript bundle from src/funcs/aurora-database-create-owner.lambda.ts",
-      "steps": [
-        {
-          "execArgs": [
-            "esbuild",
-            "--bundle",
-            "src/funcs/aurora-database-create-owner.lambda.ts",
-            "--target=node24",
-            "--platform=node",
-            "--outfile=assets/funcs/aurora-database-create-owner.lambda/index.js",
-            "--tsconfig=test/tsconfig.json",
-            "--external:@aws-sdk/*",
-            "--sourcemap",
-            "--watch"
-          ]
         }
       ]
     },
@@ -137,6 +98,7 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-migrator.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap"
@@ -156,6 +118,48 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-migrator.lambda/index.js",
+            "--packages=bundle",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap",
+            "--watch"
+          ]
+        }
+      ]
+    },
+    "bundle:funcs/create-owner.lambda": {
+      "name": "bundle:funcs/create-owner.lambda",
+      "description": "Create a JavaScript bundle from src/funcs/create-owner.lambda.ts",
+      "steps": [
+        {
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-owner.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-owner.lambda/index.js",
+            "--packages=bundle",
+            "--tsconfig=test/tsconfig.json",
+            "--external:@aws-sdk/*",
+            "--sourcemap"
+          ]
+        }
+      ]
+    },
+    "bundle:funcs/create-owner.lambda:watch": {
+      "name": "bundle:funcs/create-owner.lambda:watch",
+      "description": "Continuously update the JavaScript bundle from src/funcs/create-owner.lambda.ts",
+      "steps": [
+        {
+          "execArgs": [
+            "esbuild",
+            "--bundle",
+            "src/funcs/create-owner.lambda.ts",
+            "--target=node24",
+            "--platform=node",
+            "--outfile=assets/funcs/create-owner.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap",
@@ -176,6 +180,7 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-schema.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap"
@@ -195,6 +200,7 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-schema.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap",
@@ -215,6 +221,7 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-user.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap"
@@ -234,6 +241,7 @@
             "--target=node24",
             "--platform=node",
             "--outfile=assets/funcs/create-user.lambda/index.js",
+            "--packages=bundle",
             "--tsconfig=test/tsconfig.json",
             "--external:@aws-sdk/*",
             "--sourcemap",
@@ -479,7 +487,8 @@
         {
           "exec": "git diff --ignore-space-at-eol --exit-code"
         }
-      ]
+      ],
+      "condition": "git log --oneline -1 | grep -v \"chore(release):\" > /dev/null"
     },
     "test": {
       "name": "test",

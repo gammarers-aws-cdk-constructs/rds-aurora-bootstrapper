@@ -5,8 +5,32 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { AuroraDatabaseCreateOwnerFunction } from '../funcs/aurora-database-create-owner-function';
-import { assertSafePostgresqlIdentifier } from './libs/postgresql/assert-identifier';
+import { CreateOwnerFunction } from './funcs/create-owner-function';
+import {
+  RESOURCE_PROPERTY_CLUSTER_ARN,
+  RESOURCE_PROPERTY_DATABASE_NAME,
+  RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+  SAFE_POSTGRESQL_IDENTIFIER_PATTERN,
+} from './settings/consts';
+
+/**
+ * Rejects identifiers that cannot be safely quoted into SQL.
+ *
+ * @param name - Candidate identifier.
+ * @param label - Field name used in error messages.
+ * @throws Error when `name` does not match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
+ */
+const assertSafePostgresqlIdentifier = (name: string, label: string): void => {
+  if (SAFE_POSTGRESQL_IDENTIFIER_PATTERN.test(name)) {
+    return;
+  }
+
+  throw new Error(
+    `${label} must match ${SAFE_POSTGRESQL_IDENTIFIER_PATTERN}: got ${JSON.stringify(name)}`,
+  );
+};
 
 /**
  * Properties for {@link AuroraDatabaseCreateOwner}.
@@ -38,6 +62,8 @@ export interface AuroraDatabaseCreateOwnerProps {
  */
 export class AuroraDatabaseCreateOwner extends Construct {
   /**
+   * Creates the custom resource that provisions the database owner role.
+   *
    * @param scope - Parent construct.
    * @param id - Construct identifier.
    * @param props - Configuration for the database owner role.
@@ -50,7 +76,7 @@ export class AuroraDatabaseCreateOwner extends Construct {
     assertSafePostgresqlIdentifier(ownerUsername, 'ownerUsername');
 
     // 👇 Create database owner.
-    const createOwnerFunction = new AuroraDatabaseCreateOwnerFunction(this, 'AuroraDatabaseCreateOwnerFunction', {
+    const createOwnerFunction = new CreateOwnerFunction(this, 'CreateOwnerFunction', {
       architecture: Architecture.ARM_64,
       timeout: Duration.minutes(1),
       loggingFormat: LoggingFormat.JSON,
@@ -72,19 +98,19 @@ export class AuroraDatabaseCreateOwner extends Construct {
       resources: [dbCluster.clusterArn],
     }));
 
-    const auroraDatabaseCreateOwnerProvider = new Provider(this, 'AuroraDatabaseCreateOwnerProvider', {
+    const createOwnerProvider = new Provider(this, 'CreateOwnerProvider', {
       onEventHandler: createOwnerFunction,
     });
 
-    const createOwner = new CustomResource(this, 'AuroraDatabaseCreateOwnerCustomResource', {
-      serviceToken: auroraDatabaseCreateOwnerProvider.serviceToken,
+    const createOwner = new CustomResource(this, 'CreateOwnerCustomResource', {
+      serviceToken: createOwnerProvider.serviceToken,
       serviceTimeout: Duration.seconds(10),
       properties: {
-        MasterUserSecretArn: dbMasterUserCredentials.secretArn,
-        MasterUsername: dbMasterUserCredentials.secretValueFromJson('username').unsafeUnwrap(),
-        DatabaseName: dbName,
-        ClusterArn: dbCluster.clusterArn,
-        OwnerUsername: ownerUsername,
+        [RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN]: dbMasterUserCredentials.secretArn,
+        [RESOURCE_PROPERTY_MASTER_USERNAME]: dbMasterUserCredentials.secretValueFromJson('username').unsafeUnwrap(),
+        [RESOURCE_PROPERTY_DATABASE_NAME]: dbName,
+        [RESOURCE_PROPERTY_CLUSTER_ARN]: dbCluster.clusterArn,
+        [RESOURCE_PROPERTY_OWNER_USERNAME]: ownerUsername,
       },
     });
     createOwner.node.addDependency(dbCluster);

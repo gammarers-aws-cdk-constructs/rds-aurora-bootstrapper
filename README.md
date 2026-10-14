@@ -1,30 +1,48 @@
-# RDS Aurora Bootstrapper (AWS CDK V2)
+# RDS Aurora Bootstrapper (CDK v2)
 
-[![npm version](https://img.shields.io/npm/v/rds-aurora-bootstrapper)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
-[![npm license](https://img.shields.io/npm/l/rds-aurora-bootstrapper)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
-[![Node.js](https://img.shields.io/node/v/rds-aurora-bootstrapper)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
+[![npm version](https://img.shields.io/npm/v/rds-aurora-bootstrapper?style=flat-square)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
+[![license](https://img.shields.io/npm/l/rds-aurora-bootstrapper?style=flat-square)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
+[![Node.js](https://img.shields.io/node/v/rds-aurora-bootstrapper?style=flat-square)](https://www.npmjs.com/package/rds-aurora-bootstrapper)
+[![build](https://img.shields.io/github/actions/workflow/status/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper/build.yml?label=build&style=flat-square)](https://github.com/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper/actions/workflows/build.yml)
+
+[![View on Construct Hub](https://constructs.dev/badge?package=rds-aurora-bootstrapper)](https://constructs.dev/packages/rds-aurora-bootstrapper)
 
 AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Data API.
 
 ## Features
 
 - **`AuroraDatabaseCreateOwner`** — creates a `NOLOGIN NOINHERIT` owner role and grants it to the master user
-- **`AuroraDatabaseCreateSchema`** — creates a schema, assigns ownership to an existing owner role, and optionally drops the `public` schema with `CASCADE`
+- **`AuroraDatabaseCreateSchema`** — creates a schema, assigns ownership to an existing owner role, and drops the `public` schema with `CASCADE` when `PublicSchema.DROP` is set
 - **`AuroraDatabaseCreateUser`** — creates a `LOGIN` application user from a Secrets Manager credential secret, grants `CONNECT` / schema `USAGE` / table DML, and sets default privileges for the owner role
 - **`AuroraDatabaseCreateMigrator`** — creates a `LOGIN` migrator user from a Secrets Manager credential secret, grants `CONNECT`, grants membership in the owner role, and sets `search_path` to the target schema
 - Idempotent owner, user, and migrator role creation — skips creation when the role already exists
 - Validates PostgreSQL identifiers at synthesis time (`ownerUsername`, `schemaName`)
 - Resolves the master username from the credentials secret through a CloudFormation dynamic reference
-- Bundled Lambda custom resources with IAM permissions and Secrets Manager read access configured automatically
+
+## How it works
+
+Add the constructs to a stack in order: owner role, schema, migrator user, then application user. On deploy, each construct calls the Aurora RDS Data API with the master credentials.
+
+The owner construct creates a `NOLOGIN NOINHERIT` role and grants it to the master user. The schema construct creates the schema, assigns that owner, and either leaves or drops the `public` schema. The migrator construct creates a `LOGIN` role that belongs to the owner and uses the schema as `search_path`. The application user construct creates a `LOGIN` role with connect, schema usage, and table DML privileges. When a role already exists, creation is skipped.
 
 ## Installation
 
-```bash
-npm install rds-aurora-bootstrapper aws-cdk-lib constructs
-```
+### npm
 
 ```bash
-yarn add rds-aurora-bootstrapper aws-cdk-lib constructs
+npm install rds-aurora-bootstrapper
+```
+
+### yarn
+
+```bash
+yarn add rds-aurora-bootstrapper
+```
+
+### pnpm
+
+```bash
+pnpm add rds-aurora-bootstrapper
 ```
 
 ## Usage
@@ -47,6 +65,7 @@ import {
   AuroraDatabaseCreateSchema,
   AuroraDatabaseCreateMigrator,
   AuroraDatabaseCreateUser,
+  PublicSchema,
 } from 'rds-aurora-bootstrapper';
 
 export class MyStack extends Stack {
@@ -90,7 +109,7 @@ export class MyStack extends Stack {
       dbName: 'appdb',
       ownerUsername: 'app_owner',
       schemaName: 'app_schema',
-      isDropPublicSchema: true,
+      publicSchema: PublicSchema.DROP,
     });
     createSchema.node.addDependency(createOwner);
 
@@ -117,6 +136,8 @@ export class MyStack extends Stack {
 }
 ```
 
+Set `publicSchema` to `PublicSchema.KEEP` to leave the `public` schema in place.
+
 ## Options
 
 ### `AuroraDatabaseCreateOwnerProps`
@@ -137,7 +158,7 @@ export class MyStack extends Stack {
 | `dbName` | `string` | PostgreSQL database name targeted by the custom resource. |
 | `ownerUsername` | `string` | Username of the existing owner role that will own the new schema. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
 | `schemaName` | `string` | Name of the PostgreSQL schema to create. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
-| `isDropPublicSchema` | `boolean` | When `true`, drops the `public` schema with `CASCADE` after creating the target schema. |
+| `publicSchema` | `PublicSchema` | `KEEP` leaves the `public` schema in place. `DROP` drops it with `CASCADE` after creating the target schema. |
 
 ### `AuroraDatabaseCreateMigratorProps`
 
@@ -160,6 +181,10 @@ export class MyStack extends Stack {
 | `dbName` | `string` | PostgreSQL database name targeted by the custom resource. |
 | `ownerUsername` | `string` | Username of the existing owner role used for default privileges. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
 | `schemaName` | `string` | Name of the PostgreSQL schema the new user is granted access to. Must match `^[a-zA-Z_][a-zA-Z0-9_-]*$`. |
+
+## API
+
+See [API.md](API.md).
 
 ## Requirements
 

@@ -708,7 +708,7 @@ public readonly ownerUsername: string;
 
 Username of the existing owner role granted to the migrator.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -722,7 +722,7 @@ public readonly schemaName: string;
 
 Name of the PostgreSQL schema used as the migrator's `search_path`.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -797,7 +797,7 @@ public readonly ownerUsername: string;
 
 Username of the owner role to create (`NOLOGIN`, `NOINHERIT`).
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -820,8 +820,8 @@ const auroraDatabaseCreateSchemaProps: AuroraDatabaseCreateSchemaProps = { ... }
 | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.dbCluster">dbCluster</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseCluster</code> | Aurora database cluster where the schema is created. |
 | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.dbMasterUserCredentials">dbMasterUserCredentials</a></code> | <code>aws-cdk-lib.aws_secretsmanager.Secret</code> | Secrets Manager secret holding the Aurora master user credentials. |
 | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.dbName">dbName</a></code> | <code>string</code> | Name of the PostgreSQL database targeted by the custom resource. |
-| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.isDropPublicSchema">isDropPublicSchema</a></code> | <code>boolean</code> | When `true`, drops the `public` schema with `CASCADE` after creating the target schema. |
 | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.ownerUsername">ownerUsername</a></code> | <code>string</code> | Username of the existing owner role that will own the new schema. |
+| <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.publicSchema">publicSchema</a></code> | <code><a href="#rds-aurora-bootstrapper.PublicSchema">PublicSchema</a></code> | Whether to leave or drop the PostgreSQL `public` schema after the target schema is created. |
 | <code><a href="#rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.schemaName">schemaName</a></code> | <code>string</code> | Name of the PostgreSQL schema to create. |
 
 ---
@@ -864,18 +864,6 @@ Name of the PostgreSQL database targeted by the custom resource.
 
 ---
 
-##### `isDropPublicSchema`<sup>Required</sup> <a name="isDropPublicSchema" id="rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.isDropPublicSchema"></a>
-
-```typescript
-public readonly isDropPublicSchema: boolean;
-```
-
-- *Type:* boolean
-
-When `true`, drops the `public` schema with `CASCADE` after creating the target schema.
-
----
-
 ##### `ownerUsername`<sup>Required</sup> <a name="ownerUsername" id="rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.ownerUsername"></a>
 
 ```typescript
@@ -886,7 +874,21 @@ public readonly ownerUsername: string;
 
 Username of the existing owner role that will own the new schema.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
+
+---
+
+##### `publicSchema`<sup>Required</sup> <a name="publicSchema" id="rds-aurora-bootstrapper.AuroraDatabaseCreateSchemaProps.property.publicSchema"></a>
+
+```typescript
+public readonly publicSchema: PublicSchema;
+```
+
+- *Type:* <a href="#rds-aurora-bootstrapper.PublicSchema">PublicSchema</a>
+
+Whether to leave or drop the PostgreSQL `public` schema after the target schema is created.
+
+{@link PublicSchema.DROP} runs `DROP SCHEMA IF EXISTS public CASCADE`.
 
 ---
 
@@ -900,7 +902,7 @@ public readonly schemaName: string;
 
 Name of the PostgreSQL schema to create.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -977,7 +979,7 @@ public readonly ownerUsername: string;
 
 Username of the existing owner role used for default privileges.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -991,7 +993,7 @@ public readonly schemaName: string;
 
 Name of the PostgreSQL schema that the new user is granted access to.
 
-Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN }.
+Must match {@link SAFE_POSTGRESQL_IDENTIFIER_PATTERN}.
 
 ---
 
@@ -1010,4 +1012,32 @@ The handler reads `username` and `password` at runtime to create the role.
 ---
 
 
+
+## Enums <a name="Enums" id="Enums"></a>
+
+### PublicSchema <a name="PublicSchema" id="rds-aurora-bootstrapper.PublicSchema"></a>
+
+What to do with the PostgreSQL `public` schema after the target schema is created.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#rds-aurora-bootstrapper.PublicSchema.KEEP">KEEP</a></code> | Leave the `public` schema in place. |
+| <code><a href="#rds-aurora-bootstrapper.PublicSchema.DROP">DROP</a></code> | Drop the `public` schema with `CASCADE`. |
+
+---
+
+##### `KEEP` <a name="KEEP" id="rds-aurora-bootstrapper.PublicSchema.KEEP"></a>
+
+Leave the `public` schema in place.
+
+---
+
+
+##### `DROP` <a name="DROP" id="rds-aurora-bootstrapper.PublicSchema.DROP"></a>
+
+Drop the `public` schema with `CASCADE`.
+
+---
 

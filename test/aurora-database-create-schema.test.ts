@@ -8,9 +8,15 @@ import {
   DatabaseClusterEngine,
 } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import { AuroraDatabaseCreateSchema } from '../src';
+import { AuroraDatabaseCreateSchema, PublicSchema } from '../src';
+import { PUBLIC_SCHEMA_DROP, PUBLIC_SCHEMA_KEEP } from '../src/settings/consts';
 
 describe('AuroraDatabaseCreateSchema', () => {
+  test('uses the same public schema values as the handler', () => {
+    expect(PublicSchema.KEEP).toBe(PUBLIC_SCHEMA_KEEP);
+    expect(PublicSchema.DROP).toBe(PUBLIC_SCHEMA_DROP);
+  });
+
   test('matches snapshot', () => {
     const app = new App();
     const stack = new Stack(app, 'TestStack');
@@ -31,7 +37,7 @@ describe('AuroraDatabaseCreateSchema', () => {
       dbName: 'appdb',
       ownerUsername: 'app_owner',
       schemaName: 'app_schema',
-      isDropPublicSchema: true,
+      publicSchema: PublicSchema.DROP,
     });
 
     const template = Template.fromStack(stack);
@@ -58,7 +64,7 @@ describe('AuroraDatabaseCreateSchema', () => {
       dbName: 'appdb',
       ownerUsername: 'invalid name',
       schemaName: 'app_schema',
-      isDropPublicSchema: false,
+      publicSchema: PublicSchema.KEEP,
     })).toThrow(/ownerUsername must match/);
   });
 
@@ -82,7 +88,7 @@ describe('AuroraDatabaseCreateSchema', () => {
       dbName: 'appdb',
       ownerUsername: 'app_owner',
       schemaName: 'invalid;name',
-      isDropPublicSchema: false,
+      publicSchema: PublicSchema.KEEP,
     })).toThrow(/schemaName must match/);
   });
 });

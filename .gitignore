@@ -8,7 +8,7 @@
 !/package.json
 !/LICENSE
 !/.npmignore
-logs
+/logs
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -52,9 +52,10 @@ junit.xml
 .jsii
 !/API.md
 /assets/
-!/src/funcs/aurora-database-create-owner-function.ts
 !/src/funcs/create-migrator-function.ts
+!/src/funcs/create-owner-function.ts
 !/src/funcs/create-schema-function.ts
 !/src/funcs/create-user-function.ts
 !/.editorconfig
+!/.devcontainer/devcontainer.json
 !/.projenrc.ts
