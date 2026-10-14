@@ -1,5 +1,6 @@
 {
   "name": "rds-aurora-bootstrapper",
+  "description": "AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Data API.",
   "repository": {
     "type": "git",
     "url": "https://github.com/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper.git"

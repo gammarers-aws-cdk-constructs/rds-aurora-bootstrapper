@@ -221,7 +221,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "4653012075a77cc979514e37b62fee378ec3d5fa030bd4e8e89e6f25a561b11b.zip",
+          "S3Key": "2621ab2d145e4ac0c6c3513a142321505861c4f056a03d4e58f5764511eff5b5.zip",
         },
         "Description": "src/funcs/create-migrator.lambda.ts",
         "Environment": {

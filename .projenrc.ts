@@ -5,6 +5,7 @@ const project = new ProjenCdkConstructLibrary({
   releaseToNpm: true,
   npmTrustedPublishing: true,
   cdkVersion: '2.232.0',
+  description: 'AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Data API.',
   name: 'rds-aurora-bootstrapper',
   repository: 'https://github.com/gammarers-aws-cdk-constructs/rds-aurora-bootstrapper.git',
   devDeps: [

@@ -219,7 +219,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "f647be00a7690aa19020885b314be56b82c461fb874e1069e99ae900abad1191.zip",
+          "S3Key": "74efb9c48128f7c4fd0adea8f7e386ee4e00181fc1adca4faf5b3b1322ec5169.zip",
         },
         "Description": "src/funcs/create-schema.lambda.ts",
         "Environment": {

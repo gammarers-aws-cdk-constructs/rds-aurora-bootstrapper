@@ -89,6 +89,8 @@ export interface AuroraDatabaseCreateSchemaProps {
  */
 export class AuroraDatabaseCreateSchema extends Construct {
   /**
+   * Creates the custom resource that provisions the database schema.
+   *
    * @param scope - Parent construct.
    * @param id - Construct identifier.
    * @param props - Configuration for the database schema.

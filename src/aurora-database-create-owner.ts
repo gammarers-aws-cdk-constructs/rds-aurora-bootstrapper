@@ -62,6 +62,8 @@ export interface AuroraDatabaseCreateOwnerProps {
  */
 export class AuroraDatabaseCreateOwner extends Construct {
   /**
+   * Creates the custom resource that provisions the database owner role.
+   *
    * @param scope - Parent construct.
    * @param id - Construct identifier.
    * @param props - Configuration for the database owner role.

@@ -221,7 +221,7 @@ exports[`AuroraDatabaseCreateUser matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "9af484b7f1b5801b9b3af2e81bd2e5aaf2cbc3ea9561335d7c9717118669f043.zip",
+          "S3Key": "340880099edb55110d7c82fc74e34ba0c370954ec7b4919d79e7e27d6191d657.zip",
         },
         "Description": "src/funcs/create-user.lambda.ts",
         "Environment": {

@@ -217,7 +217,7 @@ exports[`AuroraDatabaseCreateOwner matches snapshot 1`] = `
           "S3Bucket": {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "d977c6d7989da18c7a66c405551ff01a7d4d2609d977ffef9d6015b0bf3d89da.zip",
+          "S3Key": "b63f3bdcec417a61a690deed7cb4876787f52b99a0f0d88e77db1bda1a7541e0.zip",
         },
         "Description": "src/funcs/create-owner.lambda.ts",
         "Environment": {
