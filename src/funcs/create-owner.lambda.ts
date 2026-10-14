@@ -1,7 +1,15 @@
 import { RDSDataClient, ExecuteStatementCommand, BeginTransactionCommand, CommitTransactionCommand, RollbackTransactionCommand } from '@aws-sdk/client-rds-data';
 import { Context, CdkCustomResourceEvent, CdkCustomResourceResponse, CdkCustomResourceHandler } from 'aws-lambda';
-import { quotePostgresqlIdentifier } from './libs/postgresql/quote-identifier';
-import { assertSafePostgresqlIdentifier } from '../constructs/libs/postgresql/assert-identifier';
+import { assertSafePostgresqlIdentifier } from './core/assert-identifier';
+import { quotePostgresqlIdentifier } from './core/quote-identifier';
+import { readStringProperty } from './core/read-string-property';
+import {
+  RESOURCE_PROPERTY_CLUSTER_ARN,
+  RESOURCE_PROPERTY_DATABASE_NAME,
+  RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+} from '../settings/consts';
 
 /** Reused RDS Data API client for the Lambda execution environment. */
 const rdsDataClient = new RDSDataClient({});
@@ -22,7 +30,7 @@ const rdsDataClient = new RDSDataClient({});
  * @param event - CloudFormation custom resource event.
  * @param context - Lambda execution context.
  * @returns Custom resource response with a physical resource ID and optional data.
- * @throws Error when `MasterUsername` fails identifier validation.
+ * @throws RdsAuroraBootstrapperValidateError when `MasterUsername` fails identifier validation.
  * @throws Rethrows any error after rolling back an open transaction on Create.
  */
 export const handler: CdkCustomResourceHandler = async (event: CdkCustomResourceEvent, context: Context): Promise<CdkCustomResourceResponse> => {
@@ -30,11 +38,11 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
 
   switch (event.RequestType) {
     case 'Create':
-      const masterUserSecretArn = event.ResourceProperties.MasterUserSecretArn as string;
-      const masterUsername = event.ResourceProperties.MasterUsername as string;
-      const databaseName = event.ResourceProperties.DatabaseName as string;
-      const clusterArn = event.ResourceProperties.ClusterArn as string;
-      const ownerUsername = event.ResourceProperties.OwnerUsername as string;
+      const masterUserSecretArn = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN);
+      const masterUsername = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_MASTER_USERNAME);
+      const databaseName = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_DATABASE_NAME);
+      const clusterArn = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_CLUSTER_ARN);
+      const ownerUsername = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_OWNER_USERNAME);
 
       const physicalResourceId = `${clusterArn}:${databaseName}:${ownerUsername}`;
       assertSafePostgresqlIdentifier(masterUsername, 'MasterUsername');
@@ -64,14 +72,14 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
         })();
 
         if (!exists) {
-          // Create user
+          // Create the owner role when it does not already exist.
           await rdsDataClient.send(new ExecuteStatementCommand({
             ...rdsDataTarget,
             transactionId,
             sql: `CREATE ROLE ${quotedOwnerUsername} NOLOGIN NOINHERIT`,
           }));
 
-          // 👇 次の処理のために実行ロールを変更
+          // Grant the owner role to the master user so later statements can use it.
           await rdsDataClient.send(new ExecuteStatementCommand({
             ...rdsDataTarget,
             transactionId,

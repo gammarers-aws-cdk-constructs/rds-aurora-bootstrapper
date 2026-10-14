@@ -1,4 +1,5 @@
-import { assertSafePostgresqlIdentifier } from '../../../../src/constructs/libs/postgresql/assert-identifier';
+import { assertSafePostgresqlIdentifier } from '../../../src/funcs/core/assert-identifier';
+import { RdsAuroraBootstrapperValidateError } from '../../../src/funcs/core/validate-errors';
 
 describe('assertSafePostgresqlIdentifier', () => {
   test.each([
@@ -17,8 +18,6 @@ describe('assertSafePostgresqlIdentifier', () => {
     'semi;colon',
     'quote"inside',
   ])('rejects %s', (name) => {
-    expect(() => assertSafePostgresqlIdentifier(name, 'name')).toThrow(
-      /name must match/,
-    );
+    expect(() => assertSafePostgresqlIdentifier(name, 'name')).toThrow(RdsAuroraBootstrapperValidateError);
   });
 });

@@ -1,4 +1,4 @@
-import { quotePostgresqlIdentifier } from '../../../../src/funcs/libs/postgresql/quote-identifier';
+import { quotePostgresqlIdentifier } from '../../../src/funcs/core/quote-identifier';
 
 describe('quotePostgresqlIdentifier', () => {
   test.each([

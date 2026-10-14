@@ -6,61 +6,25 @@ import {
   CdkCustomResourceResponse,
   CdkCustomResourceHandler,
 } from 'aws-lambda';
-import { quotePostgresqlIdentifier } from './libs/postgresql/quote-identifier';
-import { assertSafePostgresqlIdentifier } from '../constructs/libs/postgresql/assert-identifier';
+import { assertSafePostgresqlIdentifier } from './core/assert-identifier';
+import { escapePostgresqlStringLiteral } from './core/escape-string-literal';
+import { parseUserCredentials } from './core/parse-user-credentials';
+import { quotePostgresqlIdentifier } from './core/quote-identifier';
+import { readStringProperty } from './core/read-string-property';
+import {
+  RESOURCE_PROPERTY_CLUSTER_ARN,
+  RESOURCE_PROPERTY_DATABASE_NAME,
+  RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+  RESOURCE_PROPERTY_SCHEMA_NAME,
+  RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN,
+} from '../settings/consts';
 
 /** Reused Secrets Manager client for the Lambda execution environment. */
 const secretsClient = new SecretsManagerClient({});
 /** Reused RDS Data API client for the Lambda execution environment. */
 const rdsDataClient = new RDSDataClient({});
-
-/**
- * Target application user credentials loaded from Secrets Manager.
- */
-interface TargetUserCredentials {
-  /** PostgreSQL role name to create (`LOGIN`). */
-  readonly username: string;
-  /** Password assigned to the new `LOGIN` role. */
-  readonly password: string;
-}
-
-/**
- * Parses and validates a Secrets Manager secret string as database credentials.
- *
- * @param secretString - Raw secret string from Secrets Manager.
- * @returns Username and password fields.
- * @throws Error when the secret is missing, not JSON, or lacks string `username`/`password`.
- */
-const parseTargetUserCredentials = (secretString: string | undefined): TargetUserCredentials => {
-  if (secretString === undefined) {
-    throw new Error('Target user secret has no SecretString');
-  }
-
-  const parsed: unknown = JSON.parse(secretString);
-  if (
-    typeof parsed !== 'object'
-    || parsed === null
-    || !('username' in parsed)
-    || !('password' in parsed)
-  ) {
-    throw new Error('Target user secret must be a JSON object with username and password');
-  }
-
-  const { username, password } = parsed;
-  if (typeof username !== 'string' || typeof password !== 'string') {
-    throw new Error('Target user secret username and password must be strings');
-  }
-
-  return { username, password };
-};
-
-/**
- * Escapes a PostgreSQL string literal for use inside single quotes.
- *
- * @param value - Raw string value (for example a password).
- * @returns Value with single quotes doubled for SQL embedding.
- */
-const escapePostgresqlStringLiteral = (value: string): string => value.replace(/'/g, "''");
 
 /**
  * Custom resource handler that creates a PostgreSQL application user on Aurora.
@@ -82,7 +46,7 @@ const escapePostgresqlStringLiteral = (value: string): string => value.replace(/
  * @param event - CloudFormation custom resource event.
  * @param context - Lambda execution context.
  * @returns Custom resource response with a physical resource ID and optional data.
- * @throws Error when identifier or secret validation fails.
+ * @throws RdsAuroraBootstrapperValidateError when identifier or secret validation fails.
  * @throws Rethrows any error after rolling back an open transaction on Create.
  */
 export const handler: CdkCustomResourceHandler = async (event: CdkCustomResourceEvent, context: Context): Promise<CdkCustomResourceResponse> => {
@@ -90,20 +54,20 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
 
   switch (event.RequestType) {
     case 'Create':
-      const masterUserSecretArn = event.ResourceProperties.MasterUserSecretArn as string;
-      const masterUsername = event.ResourceProperties.MasterUsername as string;
-      const databaseName = event.ResourceProperties.DatabaseName as string;
-      const clusterArn = event.ResourceProperties.ClusterArn as string;
-      const targetUserSecretArn = event.ResourceProperties.TargetUserSecretArn as string;
-      const ownerUsername = event.ResourceProperties.OwnerUsername as string;
-      const schemaName = event.ResourceProperties.SchemaName as string;
+      const masterUserSecretArn = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN);
+      const masterUsername = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_MASTER_USERNAME);
+      const databaseName = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_DATABASE_NAME);
+      const clusterArn = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_CLUSTER_ARN);
+      const targetUserSecretArn = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN);
+      const ownerUsername = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_OWNER_USERNAME);
+      const schemaName = readStringProperty(event.ResourceProperties, RESOURCE_PROPERTY_SCHEMA_NAME);
 
       assertSafePostgresqlIdentifier(masterUsername, 'MasterUsername');
 
       const targetUserSecretData = await secretsClient.send(new GetSecretValueCommand({
         SecretId: targetUserSecretArn,
       }));
-      const { username, password } = parseTargetUserCredentials(targetUserSecretData.SecretString);
+      const { username, password } = parseUserCredentials(targetUserSecretData.SecretString, 'Target user');
       assertSafePostgresqlIdentifier(username, 'TargetUsername');
 
       const physicalResourceId = `${clusterArn}:${databaseName}:${username}`;

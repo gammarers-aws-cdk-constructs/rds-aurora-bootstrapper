@@ -177,7 +177,6 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
           ],
         },
         "DatabaseName": "appdb",
-        "IsDropPublicSchema": true,
         "MasterUserSecretArn": {
           "Ref": "MasterUserSecret68CFFBC6",
         },
@@ -194,6 +193,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
           ],
         },
         "OwnerUsername": "app_owner",
+        "PublicSchema": "DROP",
         "SchemaName": "app_schema",
         "ServiceTimeout": "10",
         "ServiceToken": {
