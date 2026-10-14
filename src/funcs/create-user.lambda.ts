@@ -128,7 +128,8 @@ export const handler: CdkCustomResourceHandler = async (event: CdkCustomResource
           await rdsDataClient.send(new ExecuteStatementCommand({
             ...rdsDataTarget,
             transactionId,
-            sql: `ALTER DEFAULT PRIVILEGES FOR ROLE ${quotedOwnerUsername} IN SCHEMA ${quotedSchemaName} GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${quotedUsername}`,
+            sql: `ALTER DEFAULT PRIVILEGES FOR ROLE ${quotedOwnerUsername} IN SCHEMA ${quotedSchemaName} `
+              + `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${quotedUsername}`,
           }));
         }
 
