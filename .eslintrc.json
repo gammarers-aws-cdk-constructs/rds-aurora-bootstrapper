@@ -45,6 +45,10 @@
     "node_modules/",
     "*.generated.ts",
     "coverage",
+    "src/funcs/create-migrator-function.ts",
+    "src/funcs/create-owner-function.ts",
+    "src/funcs/create-schema-function.ts",
+    "src/funcs/create-user-function.ts",
     "!.projenrc.ts",
     "!projenrc/**/*.ts"
   ],
