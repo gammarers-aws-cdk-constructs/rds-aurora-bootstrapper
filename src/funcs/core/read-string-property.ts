@@ -1,5 +1,8 @@
 import { RdsAuroraBootstrapperValidateError } from './validate-errors';
 
+/** CloudFormation custom resource properties passed to a bootstrap handler. */
+export type ResourceProperties = { readonly [key: string]: unknown };
+
 /**
  * Reads a required string from custom resource properties.
  *
@@ -9,7 +12,7 @@ import { RdsAuroraBootstrapperValidateError } from './validate-errors';
  * @throws RdsAuroraBootstrapperValidateError when the property is missing or not a string.
  */
 export const readStringProperty = (
-  properties: { readonly [key: string]: unknown },
+  properties: ResourceProperties,
   key: string,
 ): string => {
   const value = properties[key];

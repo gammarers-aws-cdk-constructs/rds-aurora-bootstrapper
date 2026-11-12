@@ -24,9 +24,6 @@
 /package-lock.json linguist-generated
 /package.json linguist-generated
 /projenrc/tsconfig.json linguist-generated linguist-language=JSON-with-Comments
-/src/funcs/create-migrator-function.ts linguist-generated
-/src/funcs/create-owner-function.ts linguist-generated
-/src/funcs/create-schema-function.ts linguist-generated
-/src/funcs/create-user-function.ts linguist-generated
+/src/funcs/bootstrap-function.ts linguist-generated
 /test/tsconfig.json linguist-generated linguist-language=JSON-with-Comments
 /tsconfig.json linguist-generated

@@ -5,12 +5,14 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { CreateOwnerFunction } from './funcs/create-owner-function';
+import { BootstrapFunction } from './funcs/bootstrap-function';
 import {
+  BOOTSTRAP_OPERATION_CREATE_OWNER,
   RESOURCE_PROPERTY_CLUSTER_ARN,
   RESOURCE_PROPERTY_DATABASE_NAME,
   RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
   RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OPERATION,
   RESOURCE_PROPERTY_OWNER_USERNAME,
   SAFE_POSTGRESQL_IDENTIFIER_PATTERN,
 } from './settings/consts';
@@ -59,6 +61,9 @@ export interface AuroraDatabaseCreateOwnerProps {
  * The master username is derived from the `username` field of
  * {@link AuroraDatabaseCreateOwnerProps.dbMasterUserCredentials} through a
  * Secrets Manager dynamic reference; callers do not pass it explicitly.
+ *
+ * The handler is a singleton Lambda shared with the other bootstrap constructs
+ * in the same stack.
  */
 export class AuroraDatabaseCreateOwner extends Construct {
   /**
@@ -76,7 +81,7 @@ export class AuroraDatabaseCreateOwner extends Construct {
     assertSafePostgresqlIdentifier(ownerUsername, 'ownerUsername');
 
     // 👇 Create database owner.
-    const createOwnerFunction = new CreateOwnerFunction(this, 'CreateOwnerFunction', {
+    const createOwnerFunction = new BootstrapFunction(this, 'BootstrapFunction', {
       architecture: Architecture.ARM_64,
       timeout: Duration.minutes(1),
       loggingFormat: LoggingFormat.JSON,
@@ -93,10 +98,6 @@ export class AuroraDatabaseCreateOwner extends Construct {
       ],
       resources: [dbCluster.clusterArn],
     }));
-    createOwnerFunction.addToRolePolicy(new PolicyStatement({
-      actions: ['rds-data:ExecuteStatement'],
-      resources: [dbCluster.clusterArn],
-    }));
 
     const createOwnerProvider = new Provider(this, 'CreateOwnerProvider', {
       onEventHandler: createOwnerFunction,
@@ -111,6 +112,7 @@ export class AuroraDatabaseCreateOwner extends Construct {
         [RESOURCE_PROPERTY_DATABASE_NAME]: dbName,
         [RESOURCE_PROPERTY_CLUSTER_ARN]: dbCluster.clusterArn,
         [RESOURCE_PROPERTY_OWNER_USERNAME]: ownerUsername,
+        [RESOURCE_PROPERTY_OPERATION]: BOOTSTRAP_OPERATION_CREATE_OWNER,
       },
     });
     createOwner.node.addDependency(dbCluster);

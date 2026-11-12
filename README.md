@@ -21,7 +21,7 @@ AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Dat
 
 ## How it works
 
-Add the constructs to a stack in order: owner role, schema, migrator user, then application user. On deploy, each construct calls the Aurora RDS Data API with the master credentials.
+Add the constructs to a stack in order: owner role, schema, migrator user, then application user. On deploy, the constructs share one Lambda function that calls the Aurora RDS Data API with the master credentials.
 
 The owner construct creates a `NOLOGIN NOINHERIT` role and grants it to the master user. The schema construct creates the schema, assigns that owner, and either leaves or drops the `public` schema. The migrator construct creates a `LOGIN` role that belongs to the owner and uses the schema as `search_path`. The application user construct creates a `LOGIN` role with connect, schema usage, and table DML privileges. When a role already exists, creation is skipped.
 

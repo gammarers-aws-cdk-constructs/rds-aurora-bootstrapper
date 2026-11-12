@@ -5,13 +5,15 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { CreateMigratorFunction } from './funcs/create-migrator-function';
+import { BootstrapFunction } from './funcs/bootstrap-function';
 import {
+  BOOTSTRAP_OPERATION_CREATE_MIGRATOR,
   RESOURCE_PROPERTY_CLUSTER_ARN,
   RESOURCE_PROPERTY_DATABASE_NAME,
   RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
   RESOURCE_PROPERTY_MASTER_USERNAME,
   RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_OPERATION,
   RESOURCE_PROPERTY_OWNER_USERNAME,
   RESOURCE_PROPERTY_SCHEMA_NAME,
   SAFE_POSTGRESQL_IDENTIFIER_PATTERN,
@@ -83,6 +85,9 @@ export interface AuroraDatabaseCreateMigratorProps {
  * {@link AuroraDatabaseCreateMigratorProps.schemaName} already exist (for
  * example via {@link AuroraDatabaseCreateOwner} and
  * {@link AuroraDatabaseCreateSchema}) before this resource runs.
+ *
+ * The handler is a singleton Lambda shared with the other bootstrap constructs
+ * in the same stack.
  */
 export class AuroraDatabaseCreateMigrator extends Construct {
   /**
@@ -108,7 +113,7 @@ export class AuroraDatabaseCreateMigrator extends Construct {
     assertSafePostgresqlIdentifier(schemaName, 'schemaName');
 
     // 👇 Create database migrator.
-    const createMigratorFunction = new CreateMigratorFunction(this, 'CreateMigratorFunction', {
+    const createMigratorFunction = new BootstrapFunction(this, 'BootstrapFunction', {
       architecture: Architecture.ARM_64,
       timeout: Duration.minutes(1),
       loggingFormat: LoggingFormat.JSON,
@@ -142,6 +147,7 @@ export class AuroraDatabaseCreateMigrator extends Construct {
         [RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN]: migratorUserCredentials.secretArn,
         [RESOURCE_PROPERTY_OWNER_USERNAME]: ownerUsername,
         [RESOURCE_PROPERTY_SCHEMA_NAME]: schemaName,
+        [RESOURCE_PROPERTY_OPERATION]: BOOTSTRAP_OPERATION_CREATE_MIGRATOR,
       },
     });
     createMigrator.node.addDependency(dbCluster);

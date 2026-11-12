@@ -195,6 +195,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
         "MigratorUserSecretArn": {
           "Ref": "MigratorUserSecret27B6425E",
         },
+        "Operation": "CREATE_MIGRATOR",
         "OwnerUsername": "app_owner",
         "SchemaName": "app_schema",
         "ServiceTimeout": "10",
@@ -207,143 +208,6 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
       },
       "Type": "AWS::CloudFormation::CustomResource",
       "UpdateReplacePolicy": "Delete",
-    },
-    "CreateMigratorCreateMigratorFunction94D3EF1B": {
-      "DependsOn": [
-        "CreateMigratorCreateMigratorFunctionServiceRoleDefaultPolicy3CE9CC3F",
-        "CreateMigratorCreateMigratorFunctionServiceRole09577692",
-      ],
-      "Properties": {
-        "Architectures": [
-          "arm64",
-        ],
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "2621ab2d145e4ac0c6c3513a142321505861c4f056a03d4e58f5764511eff5b5.zip",
-        },
-        "Description": "src/funcs/create-migrator.lambda.ts",
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
-        },
-        "Handler": "index.handler",
-        "LoggingConfig": {
-          "ApplicationLogLevel": "INFO",
-          "LogFormat": "JSON",
-          "SystemLogLevel": "INFO",
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "CreateMigratorCreateMigratorFunctionServiceRole09577692",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs24.x",
-        "Timeout": 60,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "CreateMigratorCreateMigratorFunctionServiceRole09577692": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "CreateMigratorCreateMigratorFunctionServiceRoleDefaultPolicy3CE9CC3F": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "MasterUserSecret68CFFBC6",
-              },
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "MigratorUserSecret27B6425E",
-              },
-            },
-            {
-              "Action": [
-                "rds-data:ExecuteStatement",
-                "rds-data:BeginTransaction",
-                "rds-data:CommitTransaction",
-                "rds-data:RollbackTransaction",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":rds:",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":cluster:",
-                    {
-                      "Ref": "ClusterEB0386A7",
-                    },
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "CreateMigratorCreateMigratorFunctionServiceRoleDefaultPolicy3CE9CC3F",
-        "Roles": [
-          {
-            "Ref": "CreateMigratorCreateMigratorFunctionServiceRole09577692",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "CreateMigratorCreateMigratorProviderframeworkonEvent72F587FD": {
       "DependsOn": [
@@ -362,7 +226,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
           "Variables": {
             "USER_ON_EVENT_FUNCTION_ARN": {
               "Fn::GetAtt": [
-                "CreateMigratorCreateMigratorFunction94D3EF1B",
+                "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                 "Arn",
               ],
             },
@@ -425,7 +289,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "CreateMigratorCreateMigratorFunction94D3EF1B",
+                    "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                     "Arn",
                   ],
                 },
@@ -435,7 +299,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "CreateMigratorCreateMigratorFunction94D3EF1B",
+                          "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                           "Arn",
                         ],
                       },
@@ -450,7 +314,7 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "CreateMigratorCreateMigratorFunction94D3EF1B",
+                  "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                   "Arn",
                 ],
               },
@@ -482,6 +346,143 @@ exports[`AuroraDatabaseCreateMigrator matches snapshot 1`] = `
       },
       "Type": "AWS::SecretsManager::Secret",
       "UpdateReplacePolicy": "Delete",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6": {
+      "DependsOn": [
+        "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040",
+        "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+      ],
+      "Properties": {
+        "Architectures": [
+          "arm64",
+        ],
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "2916fbf1605199e10349cadd1060bff0cfe903dc47be72a23a85f8dfd448a8a6.zip",
+        },
+        "Description": "src/funcs/bootstrap.lambda.ts",
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.handler",
+        "LoggingConfig": {
+          "ApplicationLogLevel": "INFO",
+          "LogFormat": "JSON",
+          "SystemLogLevel": "INFO",
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs24.x",
+        "Timeout": 60,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "MasterUserSecret68CFFBC6",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "MigratorUserSecret27B6425E",
+              },
+            },
+            {
+              "Action": [
+                "rds-data:ExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:RollbackTransaction",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":rds:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":cluster:",
+                    {
+                      "Ref": "ClusterEB0386A7",
+                    },
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040",
+        "Roles": [
+          {
+            "Ref": "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "Vpc8378EB38": {
       "Properties": {

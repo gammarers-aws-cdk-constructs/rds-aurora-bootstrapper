@@ -1,4 +1,5 @@
 import { ProjenCdkConstructLibrary } from '@gammarers/projen-projects';
+import { LambdaRuntime } from 'projen/lib/awscdk';
 const project = new ProjenCdkConstructLibrary({
   projenrcTs: true,
   releaseToNpm: true,
@@ -13,5 +14,13 @@ const project = new ProjenCdkConstructLibrary({
     '@aws-sdk/client-secrets-manager@^3.743.0',
     '@types/aws-lambda@^8.10.161',
   ],
+  lambdaOptions: {
+    runtime: LambdaRuntime.NODEJS_24_X,
+    singleton: true,
+    singletonUuid: '33651113-eb08-454f-8694-942e703e4193',
+  },
 });
+// Handler dependencies are bundled and stay devDependencies. Core modules
+// imported by the handler entrypoint use the same packages.
+project.eslint?.allowDevDeps('src/funcs/core/**/*.ts');
 project.synth();
