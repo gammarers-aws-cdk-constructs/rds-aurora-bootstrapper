@@ -16,6 +16,7 @@ AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Dat
 - **`AuroraDatabaseCreateUser`** — creates a `LOGIN` application user from a Secrets Manager credential secret, grants `CONNECT` / schema `USAGE` / table DML, and sets default privileges for the owner role
 - **`AuroraDatabaseCreateMigrator`** — creates a `LOGIN` migrator user from a Secrets Manager credential secret, grants `CONNECT`, grants membership in the owner role, and sets `search_path` to the target schema
 - Idempotent owner, user, and migrator role creation — skips creation when the role already exists
+- Updating or deleting a construct leaves the role and schema in place
 - Validates PostgreSQL identifiers at synthesis time (`ownerUsername`, `schemaName`)
 - Resolves the master username from the credentials secret through a CloudFormation dynamic reference
 
@@ -23,7 +24,7 @@ AWS CDK constructs for bootstrapping Aurora PostgreSQL databases via the RDS Dat
 
 Add the constructs to a stack in order: owner role, schema, migrator user, then application user. On deploy, the constructs share one Lambda function that calls the Aurora RDS Data API with the master credentials.
 
-The owner construct creates a `NOLOGIN NOINHERIT` role and grants it to the master user. The schema construct creates the schema, assigns that owner, and either leaves or drops the `public` schema. The migrator construct creates a `LOGIN` role that belongs to the owner and uses the schema as `search_path`. The application user construct creates a `LOGIN` role with connect, schema usage, and table DML privileges. When a role already exists, creation is skipped.
+The owner construct creates a `NOLOGIN NOINHERIT` role and grants it to the master user. The schema construct creates the schema, assigns that owner, and either leaves or drops the `public` schema. The migrator construct creates a `LOGIN` role that belongs to the owner and uses the schema as `search_path`. The application user construct creates a `LOGIN` role with connect, schema usage, and table DML privileges. When a role already exists, creation is skipped. Updating or deleting the custom resource does not drop the role or schema.
 
 ## Installation
 

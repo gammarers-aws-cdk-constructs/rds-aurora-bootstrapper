@@ -168,6 +168,11 @@ The tree node.
 
 CDK construct that provisions a PostgreSQL owner role on an Aurora cluster using a custom resource backed by the RDS Data API.
 
+On Create, the handler creates a `NOLOGIN NOINHERIT` role when
+{@link AuroraDatabaseCreateOwnerProps.ownerUsername} is missing, and grants
+that role to the master user. Role creation is idempotent when the username
+already exists.
+
 The master username is derived from the `username` field of
 {@link AuroraDatabaseCreateOwnerProps.dbMasterUserCredentials} through a
 Secrets Manager dynamic reference; callers do not pass it explicitly.
