@@ -5,6 +5,16 @@ import { createOwner } from '../../src/funcs/core/create-owner';
 import { createSchema } from '../../src/funcs/core/create-schema';
 import { createUser } from '../../src/funcs/core/create-user';
 import { RdsAuroraBootstrapperValidateError } from '../../src/funcs/core/validate-errors';
+import {
+  BOOTSTRAP_OPERATION_CREATE_MIGRATOR,
+  BOOTSTRAP_OPERATION_CREATE_OWNER,
+  BOOTSTRAP_OPERATION_CREATE_SCHEMA,
+  BOOTSTRAP_OPERATION_CREATE_USER,
+  RESOURCE_PROPERTY_CLUSTER_ARN,
+  RESOURCE_PROPERTY_DATABASE_NAME,
+  RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_OPERATION,
+} from '../../src/settings/consts';
 
 jest.mock('../../src/funcs/core/create-owner', () => ({
   createOwner: jest.fn(),
@@ -19,25 +29,35 @@ jest.mock('../../src/funcs/core/create-migrator', () => ({
   createMigrator: jest.fn(),
 }));
 
+// The handler only logs the context, so the remaining Context fields are unused.
 const context = {} as Context;
 
-const createEvent = (
-  requestType: CdkCustomResourceEvent['RequestType'],
-  properties: Record<string, string> = {},
-): CdkCustomResourceEvent => ({
-  RequestType: requestType,
+const sharedEvent = {
   ServiceToken: 'token',
   ResponseURL: 'https://example.com',
   StackId: 'stack',
   RequestId: 'request',
   LogicalResourceId: 'logical',
   ResourceType: 'Custom::Bootstrap',
+};
+
+const createEvent = (properties: Record<string, string>): CdkCustomResourceEvent => ({
+  ...sharedEvent,
+  RequestType: 'Create',
   ResourceProperties: {
     ServiceToken: 'token',
     ...properties,
   },
-  PhysicalResourceId: requestType === 'Create' ? undefined : 'existing-id',
-} as CdkCustomResourceEvent);
+});
+
+const keepEvent = (requestType: 'Update' | 'Delete'): CdkCustomResourceEvent => ({
+  ...sharedEvent,
+  RequestType: requestType,
+  PhysicalResourceId: 'existing-id',
+  ResourceProperties: {
+    ServiceToken: 'token',
+  },
+});
 
 describe('bootstrap handler', () => {
   beforeEach(() => {
@@ -48,34 +68,34 @@ describe('bootstrap handler', () => {
   });
 
   test.each([
-    ['CREATE_OWNER', createOwner, 'owner-id'],
-    ['CREATE_SCHEMA', createSchema, 'schema-id'],
-    ['CREATE_USER', createUser, 'user-id'],
-    ['CREATE_MIGRATOR', createMigrator, 'migrator-id'],
+    [BOOTSTRAP_OPERATION_CREATE_OWNER, createOwner, 'owner-id'],
+    [BOOTSTRAP_OPERATION_CREATE_SCHEMA, createSchema, 'schema-id'],
+    [BOOTSTRAP_OPERATION_CREATE_USER, createUser, 'user-id'],
+    [BOOTSTRAP_OPERATION_CREATE_MIGRATOR, createMigrator, 'migrator-id'],
   ] as const)('runs %s', async (operation, operationFn, physicalResourceId) => {
-    await expect(handler(createEvent('Create', {
-      Operation: operation,
-      MasterUserSecretArn: 'arn:secret',
-      DatabaseName: 'appdb',
-      ClusterArn: 'arn:cluster',
+    await expect(handler(createEvent({
+      [RESOURCE_PROPERTY_OPERATION]: operation,
+      [RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN]: 'arn:secret',
+      [RESOURCE_PROPERTY_DATABASE_NAME]: 'appdb',
+      [RESOURCE_PROPERTY_CLUSTER_ARN]: 'arn:cluster',
     }), context)).resolves.toEqual({ PhysicalResourceId: physicalResourceId });
 
     expect(operationFn).toHaveBeenCalledTimes(1);
   });
 
   test('rejects an unknown operation', async () => {
-    await expect(handler(createEvent('Create', {
-      Operation: 'OTHER',
-      MasterUserSecretArn: 'arn:secret',
-      DatabaseName: 'appdb',
-      ClusterArn: 'arn:cluster',
+    await expect(handler(createEvent({
+      [RESOURCE_PROPERTY_OPERATION]: 'OTHER',
+      [RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN]: 'arn:secret',
+      [RESOURCE_PROPERTY_DATABASE_NAME]: 'appdb',
+      [RESOURCE_PROPERTY_CLUSTER_ARN]: 'arn:cluster',
     }), context)).rejects.toThrow(RdsAuroraBootstrapperValidateError);
 
     expect(createOwner).not.toHaveBeenCalled();
   });
 
   test.each(['Update', 'Delete'] as const)('keeps the physical resource id on %s', async (requestType) => {
-    await expect(handler(createEvent(requestType), context)).resolves.toEqual({
+    await expect(handler(keepEvent(requestType), context)).resolves.toEqual({
       PhysicalResourceId: 'existing-id',
     });
 

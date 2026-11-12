@@ -1,7 +1,14 @@
-import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import { asRdsDataClient } from './sdk-client-double';
 import { createSchema } from '../../../src/funcs/core/create-schema';
 import { RdsDataTarget } from '../../../src/funcs/core/read-rds-data-target';
 import { RdsAuroraBootstrapperValidateError } from '../../../src/funcs/core/validate-errors';
+import {
+  PUBLIC_SCHEMA_DROP,
+  PUBLIC_SCHEMA_KEEP,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+  RESOURCE_PROPERTY_PUBLIC_SCHEMA,
+  RESOURCE_PROPERTY_SCHEMA_NAME,
+} from '../../../src/settings/consts';
 
 const target: RdsDataTarget = {
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:app',
@@ -20,7 +27,7 @@ const createClient = () => {
   });
 
   return {
-    client: { send } as unknown as RDSDataClient,
+    client: asRdsDataClient({ send }),
     sql,
   };
 };
@@ -30,9 +37,9 @@ describe('createSchema', () => {
     const { client, sql } = createClient();
 
     await expect(createSchema({
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
-      PublicSchema: 'DROP',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
+      [RESOURCE_PROPERTY_PUBLIC_SCHEMA]: PUBLIC_SCHEMA_DROP,
     }, client, target)).resolves.toEqual({
       PhysicalResourceId: `${target.resourceArn}:appdb:app_owner:app_schema`,
       Data: { created: true },
@@ -51,9 +58,9 @@ describe('createSchema', () => {
     const { client, sql } = createClient();
 
     await createSchema({
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
-      PublicSchema: 'KEEP',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
+      [RESOURCE_PROPERTY_PUBLIC_SCHEMA]: PUBLIC_SCHEMA_KEEP,
     }, client, target);
 
     expect(sql).not.toContain('DROP SCHEMA IF EXISTS public CASCADE');
@@ -63,9 +70,9 @@ describe('createSchema', () => {
     const { client, sql } = createClient();
 
     await expect(createSchema({
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
-      PublicSchema: 'OTHER',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
+      [RESOURCE_PROPERTY_PUBLIC_SCHEMA]: 'OTHER',
     }, client, target)).rejects.toThrow(RdsAuroraBootstrapperValidateError);
 
     expect(sql).toEqual([]);

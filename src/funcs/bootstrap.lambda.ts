@@ -46,12 +46,14 @@ export const handler: CdkCustomResourceHandler = async (
 ): Promise<CdkCustomResourceResponse> => {
   console.log({ event, context });
 
+  // Update and Delete leave the database objects in place.
   if (event.RequestType === 'Update' || event.RequestType === 'Delete') {
     return {
       PhysicalResourceId: event.PhysicalResourceId,
     };
   }
 
+  // CloudFormation only sends Create, Update, or Delete.
   if (event.RequestType !== 'Create') {
     throw new Error('unreachable');
   }

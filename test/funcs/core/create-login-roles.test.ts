@@ -1,8 +1,14 @@
-import { RDSDataClient } from '@aws-sdk/client-rds-data';
-import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { asRdsDataClient, asSecretsManagerClient } from './sdk-client-double';
 import { createMigrator } from '../../../src/funcs/core/create-migrator';
 import { createUser } from '../../../src/funcs/core/create-user';
 import { RdsDataTarget } from '../../../src/funcs/core/read-rds-data-target';
+import {
+  RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN,
+  RESOURCE_PROPERTY_OWNER_USERNAME,
+  RESOURCE_PROPERTY_SCHEMA_NAME,
+  RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN,
+} from '../../../src/settings/consts';
 
 const target: RdsDataTarget = {
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:app',
@@ -27,8 +33,8 @@ const createClients = () => {
   }));
 
   return {
-    rdsDataClient: { send: rdsSend } as unknown as RDSDataClient,
-    secretsClient: { send: secretsSend } as unknown as SecretsManagerClient,
+    rdsDataClient: asRdsDataClient({ send: rdsSend }),
+    secretsClient: asSecretsManagerClient({ send: secretsSend }),
     sql,
   };
 };
@@ -38,10 +44,10 @@ describe('login role operations', () => {
     const { rdsDataClient, secretsClient, sql } = createClients();
 
     await createUser({
-      MasterUsername: 'postgres',
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
-      TargetUserSecretArn: 'arn:target',
+      [RESOURCE_PROPERTY_MASTER_USERNAME]: 'postgres',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
+      [RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN]: 'arn:target',
     }, rdsDataClient, secretsClient, target);
 
     expect(sql).toEqual([
@@ -58,8 +64,8 @@ describe('login role operations', () => {
   });
 
   test.each([
-    ['user', createUser, { TargetUserSecretArn: 'arn:target' }],
-    ['migrator', createMigrator, { MigratorUserSecretArn: 'arn:migrator' }],
+    ['user', createUser, { [RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN]: 'arn:target' }],
+    ['migrator', createMigrator, { [RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN]: 'arn:migrator' }],
   ] as const)('commits without grants when the %s role already exists', async (_label, operation, secretProperty) => {
     const sql: Array<string | undefined> = [];
     const rdsSend = jest.fn(async (command: { input: { sql?: string } }) => {
@@ -74,15 +80,15 @@ describe('login role operations', () => {
     });
 
     await operation({
-      MasterUsername: 'postgres',
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
+      [RESOURCE_PROPERTY_MASTER_USERNAME]: 'postgres',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
       ...secretProperty,
-    }, { send: rdsSend } as unknown as RDSDataClient, {
+    }, asRdsDataClient({ send: rdsSend }), asSecretsManagerClient({
       send: jest.fn(async () => ({
         SecretString: JSON.stringify({ username: 'app_login', password: 'secret' }),
       })),
-    } as unknown as SecretsManagerClient, target);
+    }), target);
 
     expect(sql).toEqual([
       undefined,
@@ -95,10 +101,10 @@ describe('login role operations', () => {
     const { rdsDataClient, secretsClient, sql } = createClients();
 
     await createMigrator({
-      MasterUsername: 'postgres',
-      OwnerUsername: 'app_owner',
-      SchemaName: 'app_schema',
-      MigratorUserSecretArn: 'arn:migrator',
+      [RESOURCE_PROPERTY_MASTER_USERNAME]: 'postgres',
+      [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
+      [RESOURCE_PROPERTY_SCHEMA_NAME]: 'app_schema',
+      [RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN]: 'arn:migrator',
     }, rdsDataClient, secretsClient, target);
 
     expect(sql).toEqual([

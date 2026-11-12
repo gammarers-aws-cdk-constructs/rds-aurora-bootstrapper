@@ -41,7 +41,11 @@ describe('bootstrap Lambda', () => {
 
     const functions = Template.fromStack(stack).findResources('AWS::Lambda::Function');
     const handlers = Object.values(functions).filter((resource) => {
-      const properties = resource.Properties as { Handler?: string };
+      const properties: unknown = resource.Properties;
+      if (typeof properties !== 'object' || properties === null || !('Handler' in properties)) {
+        return false;
+      }
+
       return properties.Handler === 'index.handler';
     });
 

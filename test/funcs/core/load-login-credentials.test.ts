@@ -1,4 +1,4 @@
-import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { asSecretsManagerClient } from './sdk-client-double';
 import { loadLoginCredentials } from '../../../src/funcs/core/load-login-credentials';
 import { RdsAuroraBootstrapperValidateError } from '../../../src/funcs/core/validate-errors';
 
@@ -7,7 +7,7 @@ describe('loadLoginCredentials', () => {
     const send = jest.fn(async () => ({
       SecretString: JSON.stringify({ username: 'app_user', password: "p'w" }),
     }));
-    const client = { send } as unknown as SecretsManagerClient;
+    const client = asSecretsManagerClient({ send });
 
     await expect(loadLoginCredentials(client, 'arn:secret', 'Target user', 'TargetUsername')).resolves.toEqual({
       username: 'app_user',
@@ -20,7 +20,7 @@ describe('loadLoginCredentials', () => {
     const send = jest.fn(async () => ({
       SecretString: JSON.stringify({ username: 'bad name', password: 'secret' }),
     }));
-    const client = { send } as unknown as SecretsManagerClient;
+    const client = asSecretsManagerClient({ send });
 
     await expect(loadLoginCredentials(client, 'arn:secret', 'Target user', 'TargetUsername'))
       .rejects.toThrow(RdsAuroraBootstrapperValidateError);

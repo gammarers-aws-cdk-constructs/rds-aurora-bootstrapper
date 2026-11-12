@@ -2,9 +2,9 @@ import {
   BeginTransactionCommand,
   CommitTransactionCommand,
   ExecuteStatementCommand,
-  RDSDataClient,
   RollbackTransactionCommand,
 } from '@aws-sdk/client-rds-data';
+import { asRdsDataClient } from './sdk-client-double';
 import { runInTransaction } from '../../../src/funcs/core/rds-data-transaction';
 import { RdsDataTarget } from '../../../src/funcs/core/read-rds-data-target';
 
@@ -14,10 +14,6 @@ const target: RdsDataTarget = {
   database: 'appdb',
 };
 
-/**
- * RDS Data API client double. The SDK client is a class, so the test substitutes
- * the only method the transaction helper calls.
- */
 const createClient = (results: unknown[]) => {
   const commands: Array<{ name: string; sql?: string }> = [];
   const send = jest.fn(async (command: { constructor: { name: string }; input: { sql?: string } }) => {
@@ -30,7 +26,7 @@ const createClient = (results: unknown[]) => {
   });
 
   return {
-    client: { send } as unknown as RDSDataClient,
+    client: asRdsDataClient({ send }),
     commands,
   };
 };

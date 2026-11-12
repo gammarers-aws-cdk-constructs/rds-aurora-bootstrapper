@@ -1,6 +1,12 @@
-import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import {
+  BeginTransactionCommand,
+  CommitTransactionCommand,
+  ExecuteStatementCommand,
+} from '@aws-sdk/client-rds-data';
+import { asRdsDataClient } from './sdk-client-double';
 import { createOwner } from '../../../src/funcs/core/create-owner';
 import { RdsDataTarget } from '../../../src/funcs/core/read-rds-data-target';
+import { RESOURCE_PROPERTY_MASTER_USERNAME, RESOURCE_PROPERTY_OWNER_USERNAME } from '../../../src/settings/consts';
 
 const target: RdsDataTarget = {
   resourceArn: 'arn:aws:rds:us-east-1:123456789012:cluster:app',
@@ -9,8 +15,8 @@ const target: RdsDataTarget = {
 };
 
 const properties = {
-  MasterUsername: 'postgres',
-  OwnerUsername: 'app_owner',
+  [RESOURCE_PROPERTY_MASTER_USERNAME]: 'postgres',
+  [RESOURCE_PROPERTY_OWNER_USERNAME]: 'app_owner',
 };
 
 const createClient = (results: unknown[]) => {
@@ -23,7 +29,7 @@ const createClient = (results: unknown[]) => {
   });
 
   return {
-    client: { send } as unknown as RDSDataClient,
+    client: asRdsDataClient({ send }),
     names,
     sql,
   };
@@ -45,11 +51,11 @@ describe('createOwner', () => {
     });
 
     expect(names).toEqual([
-      'BeginTransactionCommand',
-      'ExecuteStatementCommand',
-      'ExecuteStatementCommand',
-      'ExecuteStatementCommand',
-      'CommitTransactionCommand',
+      BeginTransactionCommand.name,
+      ExecuteStatementCommand.name,
+      ExecuteStatementCommand.name,
+      ExecuteStatementCommand.name,
+      CommitTransactionCommand.name,
     ]);
     expect(sql).toEqual([
       undefined,
@@ -70,9 +76,9 @@ describe('createOwner', () => {
     await createOwner(properties, client, target);
 
     expect(names).toEqual([
-      'BeginTransactionCommand',
-      'ExecuteStatementCommand',
-      'CommitTransactionCommand',
+      BeginTransactionCommand.name,
+      ExecuteStatementCommand.name,
+      CommitTransactionCommand.name,
     ]);
     expect(sql[1]).toBe('SELECT 1 FROM pg_roles WHERE rolname = :r');
   });

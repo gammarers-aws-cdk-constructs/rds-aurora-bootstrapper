@@ -1,4 +1,4 @@
-import { RDSDataClient } from '@aws-sdk/client-rds-data';
+import { asRdsDataClient } from './sdk-client-double';
 import { RdsDataTarget } from '../../../src/funcs/core/read-rds-data-target';
 import { roleExists } from '../../../src/funcs/core/role-exists';
 
@@ -15,7 +15,7 @@ describe('roleExists', () => {
     [{}, false],
   ])('returns %j as %s', async (response, expected) => {
     const send = jest.fn(async () => response);
-    const client = { send } as unknown as RDSDataClient;
+    const client = asRdsDataClient({ send });
 
     await expect(roleExists(client, target, 'tx-1', 'app_owner')).resolves.toBe(expected);
     expect(send.mock.calls[0][0].input).toMatchObject({

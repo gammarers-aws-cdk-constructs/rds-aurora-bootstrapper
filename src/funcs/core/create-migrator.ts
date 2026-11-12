@@ -39,6 +39,7 @@ export const createMigrator = async (
   const ownerUsername = readStringProperty(properties, RESOURCE_PROPERTY_OWNER_USERNAME);
   const schemaName = readStringProperty(properties, RESOURCE_PROPERTY_SCHEMA_NAME);
   const migratorUserSecretArn = readStringProperty(properties, RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN);
+  // MasterUsername arrives from a deploy-time dynamic reference, so it is checked even though this SQL does not embed it.
   assertSafePostgresqlIdentifier(masterUsername, 'MasterUsername');
 
   const { username, quotedUsername, escapedPassword } = await loadLoginCredentials(
@@ -57,6 +58,7 @@ export const createMigrator = async (
       return;
     }
 
+    // A missing role gets a login password taken from Secrets Manager.
     await rdsDataClient.send(new ExecuteStatementCommand({
       ...target,
       transactionId,

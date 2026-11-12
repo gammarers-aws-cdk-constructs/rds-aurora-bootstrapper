@@ -31,6 +31,7 @@ export const createSchema = async (
   const ownerUsername = readStringProperty(properties, RESOURCE_PROPERTY_OWNER_USERNAME);
   const schemaName = readStringProperty(properties, RESOURCE_PROPERTY_SCHEMA_NAME);
   const publicSchema = readStringProperty(properties, RESOURCE_PROPERTY_PUBLIC_SCHEMA);
+
   if (publicSchema !== PUBLIC_SCHEMA_KEEP && publicSchema !== PUBLIC_SCHEMA_DROP) {
     throw new RdsAuroraBootstrapperValidateError(
       `${RESOURCE_PROPERTY_PUBLIC_SCHEMA} must be ${PUBLIC_SCHEMA_KEEP} or ${PUBLIC_SCHEMA_DROP}`,
@@ -41,6 +42,7 @@ export const createSchema = async (
   const quotedOwnerUsername = quotePostgresqlIdentifier(ownerUsername);
 
   await runInTransaction(client, target, async (transactionId) => {
+    // Create the schema when it is missing, then give it to the owner role.
     await client.send(new ExecuteStatementCommand({
       ...target,
       transactionId,
@@ -53,6 +55,7 @@ export const createSchema = async (
       sql: `ALTER SCHEMA ${quotedSchemaName} OWNER TO ${quotedOwnerUsername}`,
     }));
 
+    // DROP removes the default public schema and the objects inside it.
     if (publicSchema === PUBLIC_SCHEMA_DROP) {
       await client.send(new ExecuteStatementCommand({
         ...target,
