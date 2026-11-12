@@ -94,6 +94,16 @@ describe('bootstrap handler', () => {
     expect(createOwner).not.toHaveBeenCalled();
   });
 
+  test('rejects a request type outside Create, Update, and Delete', async () => {
+    // CloudFormation's event union has no other request type, so the test reaches the guard with a cast.
+    const event = {
+      ...createEvent({}),
+      RequestType: 'Replace',
+    } as CdkCustomResourceEvent;
+
+    await expect(handler(event, context)).rejects.toThrow('unreachable');
+  });
+
   test.each(['Update', 'Delete'] as const)('keeps the physical resource id on %s', async (requestType) => {
     await expect(handler(keepEvent(requestType), context)).resolves.toEqual({
       PhysicalResourceId: 'existing-id',
