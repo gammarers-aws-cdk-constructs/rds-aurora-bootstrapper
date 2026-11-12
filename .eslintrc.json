@@ -45,10 +45,7 @@
     "node_modules/",
     "*.generated.ts",
     "coverage",
-    "src/funcs/create-migrator-function.ts",
-    "src/funcs/create-owner-function.ts",
-    "src/funcs/create-schema-function.ts",
-    "src/funcs/create-user-function.ts",
+    "src/funcs/bootstrap-function.ts",
     "!.projenrc.ts",
     "!projenrc/**/*.ts"
   ],
@@ -162,10 +159,8 @@
         "devDependencies": [
           "**/test/**",
           "**/build-tools/**",
-          "src/funcs/create-migrator.lambda.ts",
-          "src/funcs/create-owner.lambda.ts",
-          "src/funcs/create-schema.lambda.ts",
-          "src/funcs/create-user.lambda.ts",
+          "src/funcs/bootstrap.lambda.ts",
+          "src/funcs/core/**/*.ts",
           ".projenrc.ts",
           "projenrc/**/*.ts"
         ],

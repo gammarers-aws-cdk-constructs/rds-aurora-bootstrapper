@@ -22,6 +22,9 @@ Ensure {@link AuroraDatabaseCreateMigratorProps.ownerUsername} and
 example via {@link AuroraDatabaseCreateOwner } and
 {@link AuroraDatabaseCreateSchema }) before this resource runs.
 
+The handler is a singleton Lambda shared with the other bootstrap constructs
+in the same stack.
+
 #### Initializers <a name="Initializers" id="rds-aurora-bootstrapper.AuroraDatabaseCreateMigrator.Initializer"></a>
 
 ```typescript
@@ -165,9 +168,17 @@ The tree node.
 
 CDK construct that provisions a PostgreSQL owner role on an Aurora cluster using a custom resource backed by the RDS Data API.
 
+On Create, the handler creates a `NOLOGIN NOINHERIT` role when
+{@link AuroraDatabaseCreateOwnerProps.ownerUsername} is missing, and grants
+that role to the master user. Role creation is idempotent when the username
+already exists.
+
 The master username is derived from the `username` field of
 {@link AuroraDatabaseCreateOwnerProps.dbMasterUserCredentials} through a
 Secrets Manager dynamic reference; callers do not pass it explicitly.
+
+The handler is a singleton Lambda shared with the other bootstrap constructs
+in the same stack.
 
 #### Initializers <a name="Initializers" id="rds-aurora-bootstrapper.AuroraDatabaseCreateOwner.Initializer"></a>
 
@@ -320,6 +331,9 @@ Secrets Manager dynamic reference; callers do not pass it explicitly.
 
 Ensure {@link AuroraDatabaseCreateSchemaProps.ownerUsername} already exists
 (for example via {@link AuroraDatabaseCreateOwner }) before this resource runs.
+
+The handler is a singleton Lambda shared with the other bootstrap constructs
+in the same stack.
 
 #### Initializers <a name="Initializers" id="rds-aurora-bootstrapper.AuroraDatabaseCreateSchema.Initializer"></a>
 
@@ -479,6 +493,9 @@ Ensure {@link AuroraDatabaseCreateUserProps.ownerUsername} and
 {@link AuroraDatabaseCreateUserProps.schemaName} already exist (for example
 via {@link AuroraDatabaseCreateOwner } and {@link AuroraDatabaseCreateSchema })
 before this resource runs.
+
+The handler is a singleton Lambda shared with the other bootstrap constructs
+in the same stack.
 
 #### Initializers <a name="Initializers" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser.Initializer"></a>
 

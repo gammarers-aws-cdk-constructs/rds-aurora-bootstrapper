@@ -192,6 +192,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
             ],
           ],
         },
+        "Operation": "CREATE_SCHEMA",
         "OwnerUsername": "app_owner",
         "PublicSchema": "DROP",
         "SchemaName": "app_schema",
@@ -205,133 +206,6 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
       },
       "Type": "AWS::CloudFormation::CustomResource",
       "UpdateReplacePolicy": "Delete",
-    },
-    "CreateSchemaCreateSchemaFunctionDF06AFDF": {
-      "DependsOn": [
-        "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A",
-        "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
-      ],
-      "Properties": {
-        "Architectures": [
-          "arm64",
-        ],
-        "Code": {
-          "S3Bucket": {
-            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
-          },
-          "S3Key": "74efb9c48128f7c4fd0adea8f7e386ee4e00181fc1adca4faf5b3b1322ec5169.zip",
-        },
-        "Description": "src/funcs/create-schema.lambda.ts",
-        "Environment": {
-          "Variables": {
-            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
-          },
-        },
-        "Handler": "index.handler",
-        "LoggingConfig": {
-          "ApplicationLogLevel": "INFO",
-          "LogFormat": "JSON",
-          "SystemLogLevel": "INFO",
-        },
-        "Role": {
-          "Fn::GetAtt": [
-            "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs24.x",
-        "Timeout": 60,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "MasterUserSecret68CFFBC6",
-              },
-            },
-            {
-              "Action": [
-                "rds-data:ExecuteStatement",
-                "rds-data:BeginTransaction",
-                "rds-data:CommitTransaction",
-                "rds-data:RollbackTransaction",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::Join": [
-                  "",
-                  [
-                    "arn:",
-                    {
-                      "Ref": "AWS::Partition",
-                    },
-                    ":rds:",
-                    {
-                      "Ref": "AWS::Region",
-                    },
-                    ":",
-                    {
-                      "Ref": "AWS::AccountId",
-                    },
-                    ":cluster:",
-                    {
-                      "Ref": "ClusterEB0386A7",
-                    },
-                  ],
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "CreateSchemaCreateSchemaFunctionServiceRoleDefaultPolicy573BBD8A",
-        "Roles": [
-          {
-            "Ref": "CreateSchemaCreateSchemaFunctionServiceRole1BC0EAA0",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
     },
     "CreateSchemaCreateSchemaProviderframeworkonEventC776930C": {
       "DependsOn": [
@@ -350,7 +224,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
           "Variables": {
             "USER_ON_EVENT_FUNCTION_ARN": {
               "Fn::GetAtt": [
-                "CreateSchemaCreateSchemaFunctionDF06AFDF",
+                "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                 "Arn",
               ],
             },
@@ -413,7 +287,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
               "Resource": [
                 {
                   "Fn::GetAtt": [
-                    "CreateSchemaCreateSchemaFunctionDF06AFDF",
+                    "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                     "Arn",
                   ],
                 },
@@ -423,7 +297,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
                     [
                       {
                         "Fn::GetAtt": [
-                          "CreateSchemaCreateSchemaFunctionDF06AFDF",
+                          "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                           "Arn",
                         ],
                       },
@@ -438,7 +312,7 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "CreateSchemaCreateSchemaFunctionDF06AFDF",
+                  "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6",
                   "Arn",
                 ],
               },
@@ -462,6 +336,133 @@ exports[`AuroraDatabaseCreateSchema matches snapshot 1`] = `
       },
       "Type": "AWS::SecretsManager::Secret",
       "UpdateReplacePolicy": "Delete",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193A00EE8C6": {
+      "DependsOn": [
+        "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040",
+        "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+      ],
+      "Properties": {
+        "Architectures": [
+          "arm64",
+        ],
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
+          },
+          "S3Key": "2916fbf1605199e10349cadd1060bff0cfe903dc47be72a23a85f8dfd448a8a6.zip",
+        },
+        "Description": "src/funcs/bootstrap.lambda.ts",
+        "Environment": {
+          "Variables": {
+            "AWS_NODEJS_CONNECTION_REUSE_ENABLED": "1",
+          },
+        },
+        "Handler": "index.handler",
+        "LoggingConfig": {
+          "ApplicationLogLevel": "INFO",
+          "LogFormat": "JSON",
+          "SystemLogLevel": "INFO",
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs24.x",
+        "Timeout": 60,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "MasterUserSecret68CFFBC6",
+              },
+            },
+            {
+              "Action": [
+                "rds-data:ExecuteStatement",
+                "rds-data:BeginTransaction",
+                "rds-data:CommitTransaction",
+                "rds-data:RollbackTransaction",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":rds:",
+                    {
+                      "Ref": "AWS::Region",
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId",
+                    },
+                    ":cluster:",
+                    {
+                      "Ref": "ClusterEB0386A7",
+                    },
+                  ],
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "SingletonLambda33651113eb08454f8694942e703e4193ServiceRoleDefaultPolicy2B43E040",
+        "Roles": [
+          {
+            "Ref": "SingletonLambda33651113eb08454f8694942e703e4193ServiceRole0C1C639A",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "Vpc8378EB38": {
       "Properties": {

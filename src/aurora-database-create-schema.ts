@@ -5,12 +5,14 @@ import { DatabaseCluster } from 'aws-cdk-lib/aws-rds';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Provider } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import { CreateSchemaFunction } from './funcs/create-schema-function';
+import { BootstrapFunction } from './funcs/bootstrap-function';
 import {
+  BOOTSTRAP_OPERATION_CREATE_SCHEMA,
   RESOURCE_PROPERTY_CLUSTER_ARN,
   RESOURCE_PROPERTY_DATABASE_NAME,
   RESOURCE_PROPERTY_MASTER_USER_SECRET_ARN,
   RESOURCE_PROPERTY_MASTER_USERNAME,
+  RESOURCE_PROPERTY_OPERATION,
   RESOURCE_PROPERTY_OWNER_USERNAME,
   RESOURCE_PROPERTY_PUBLIC_SCHEMA,
   RESOURCE_PROPERTY_SCHEMA_NAME,
@@ -86,6 +88,9 @@ export interface AuroraDatabaseCreateSchemaProps {
  *
  * Ensure {@link AuroraDatabaseCreateSchemaProps.ownerUsername} already exists
  * (for example via {@link AuroraDatabaseCreateOwner}) before this resource runs.
+ *
+ * The handler is a singleton Lambda shared with the other bootstrap constructs
+ * in the same stack.
  */
 export class AuroraDatabaseCreateSchema extends Construct {
   /**
@@ -104,7 +109,7 @@ export class AuroraDatabaseCreateSchema extends Construct {
     assertSafePostgresqlIdentifier(schemaName, 'schemaName');
 
     // 👇 Create database schema.
-    const createSchemaFunction = new CreateSchemaFunction(this, 'CreateSchemaFunction', {
+    const createSchemaFunction = new BootstrapFunction(this, 'BootstrapFunction', {
       architecture: Architecture.ARM_64,
       timeout: Duration.minutes(1),
       loggingFormat: LoggingFormat.JSON,
@@ -137,6 +142,7 @@ export class AuroraDatabaseCreateSchema extends Construct {
         [RESOURCE_PROPERTY_OWNER_USERNAME]: ownerUsername,
         [RESOURCE_PROPERTY_SCHEMA_NAME]: schemaName,
         [RESOURCE_PROPERTY_PUBLIC_SCHEMA]: publicSchema,
+        [RESOURCE_PROPERTY_OPERATION]: BOOTSTRAP_OPERATION_CREATE_SCHEMA,
       },
     });
     createSchema.node.addDependency(dbCluster);

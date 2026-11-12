@@ -52,10 +52,7 @@ junit.xml
 .jsii
 !/API.md
 /assets/
-!/src/funcs/create-migrator-function.ts
-!/src/funcs/create-owner-function.ts
-!/src/funcs/create-schema-function.ts
-!/src/funcs/create-user-function.ts
+!/src/funcs/bootstrap-function.ts
 !/.editorconfig
 !/.devcontainer/devcontainer.json
 !/.projenrc.ts

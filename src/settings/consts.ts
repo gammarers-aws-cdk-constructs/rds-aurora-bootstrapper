@@ -45,3 +45,18 @@ export const RESOURCE_PROPERTY_TARGET_USER_SECRET_ARN = 'TargetUserSecretArn';
 
 /** Custom resource property for the migrator user secret ARN. */
 export const RESOURCE_PROPERTY_MIGRATOR_USER_SECRET_ARN = 'MigratorUserSecretArn';
+
+/** Custom resource property that selects which bootstrap operation to run. */
+export const RESOURCE_PROPERTY_OPERATION = 'Operation';
+
+/** Bootstrap operation that creates the owner role. */
+export const BOOTSTRAP_OPERATION_CREATE_OWNER = 'CREATE_OWNER';
+
+/** Bootstrap operation that creates the schema. */
+export const BOOTSTRAP_OPERATION_CREATE_SCHEMA = 'CREATE_SCHEMA';
+
+/** Bootstrap operation that creates the application user. */
+export const BOOTSTRAP_OPERATION_CREATE_USER = 'CREATE_USER';
+
+/** Bootstrap operation that creates the migrator user. */
+export const BOOTSTRAP_OPERATION_CREATE_MIGRATOR = 'CREATE_MIGRATOR';
