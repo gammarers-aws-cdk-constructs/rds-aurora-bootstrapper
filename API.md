@@ -4,6 +4,8 @@
 
 ### AuroraDatabaseCreateMigrator <a name="AuroraDatabaseCreateMigrator" id="rds-aurora-bootstrapper.AuroraDatabaseCreateMigrator"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable
+
 CDK construct that provisions a PostgreSQL migrator user on an Aurora cluster using a custom resource backed by the RDS Data API.
 
 On Create, the handler creates a `LOGIN` role from
@@ -166,6 +168,8 @@ The tree node.
 
 ### AuroraDatabaseCreateOwner <a name="AuroraDatabaseCreateOwner" id="rds-aurora-bootstrapper.AuroraDatabaseCreateOwner"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable
+
 CDK construct that provisions a PostgreSQL owner role on an Aurora cluster using a custom resource backed by the RDS Data API.
 
 On Create, the handler creates a `NOLOGIN NOINHERIT` role when
@@ -321,6 +325,8 @@ The tree node.
 
 ### AuroraDatabaseCreateSchema <a name="AuroraDatabaseCreateSchema" id="rds-aurora-bootstrapper.AuroraDatabaseCreateSchema"></a>
 
+- *Implements:* constructs.IConstruct, constructs.IDependable
+
 CDK construct that provisions a PostgreSQL schema on an Aurora cluster using a custom resource backed by the RDS Data API.
 
 On Create, the handler creates the schema (if missing), assigns ownership to
@@ -475,6 +481,8 @@ The tree node.
 
 
 ### AuroraDatabaseCreateUser <a name="AuroraDatabaseCreateUser" id="rds-aurora-bootstrapper.AuroraDatabaseCreateUser"></a>
+
+- *Implements:* constructs.IConstruct, constructs.IDependable
 
 CDK construct that provisions a PostgreSQL application user on an Aurora cluster using a custom resource backed by the RDS Data API.
 
